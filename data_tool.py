@@ -174,9 +174,9 @@ def plot_instances(user, activity, session, df, instance_id, data_length, plot=T
     return acc_raw_list, acc_denoise_norm_list, acc_denoise_degravity_norm_list, gyro_raw_list, gyro_denoise_norm_list
 
 class Dataset:
-    '''
+    """
     The imu file should be a .csv file and label file should be .xlss file
-    '''
+    """
     def __init__(self, imu_file_name, label_file_name):
         self.df_facetouch_imu = pd.read_csv(imu_file_name, index_col=[0])
         # Remove Cover Mouth

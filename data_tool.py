@@ -1,6 +1,8 @@
-'''
-This file is used as a toolkit for data
-'''
+"""
+data_tool.py
+=========================
+This is the module for create sorted data frame and training data list
+"""
 import pandas as pd
 import time
 import numpy as np

@@ -1,3 +1,8 @@
+"""
+filters.py
+=================================
+This is the module that support filter function
+"""
 from scipy.signal import medfilt, butter, lfilter, filtfilt, freqz
 import numpy as np
 

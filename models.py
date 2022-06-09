@@ -1,3 +1,9 @@
+"""
+models.py
+=================================
+This is the module for models usage and training pipeline
+"""
+
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
@@ -5,7 +11,6 @@ from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import MaxPooling1D
-from tensorflow.keras import backend as K
 
 class Model:
     def __init__(self, model_name, log=False):

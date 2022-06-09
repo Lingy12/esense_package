@@ -1,6 +1,6 @@
 """
 data_tool.py
-=========================
+================================================================
 This is the module for create sorted data frame and training data list
 """
 import pandas as pd
@@ -60,9 +60,6 @@ def get_activity_mucous_code(activity):
     else:
         print("activity error")
 
-'''
-Process the raw data
-'''
 def data_preprocessing(df_row,data_length,gyro):
     accX = df_row[[str(i) for i in range(data_length)]]
     accX_norm = normalization_minmax(accX)

@@ -1,8 +1,13 @@
+"""
+evaluate_tool.py
+===============================================
+This is the module for evaluate the model result
+"""
+
 from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay,accuracy_score
 from sklearn.metrics import classification_report
 import numpy as np
 import matplotlib.pyplot as plt 
-
 
 
 def get_confusionmatrix(y_pred, y_true, classes_list, title, 

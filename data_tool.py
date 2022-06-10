@@ -21,16 +21,40 @@ non_mucous_activity_label_list = ['[None-M]Touch forehead',
 
 activity_label_list = mucous_activity_label_list + non_mucous_activity_label_list
 
-def getDateAndTime(seconds=None):
+def getDateAndTime(seconds:str=None) -> str:
+    """Get the date and time in required format
+
+    Args:
+        seconds (str, optional): utc string in any format. Defaults to None.
+
+    Returns:
+        date time string in %Y/%m/%d %H:%M:%S.
+    """
     return time.strftime("%Y/%m/%d %H:%M:%S", time.gmtime(seconds))
 
-def get_activity_code(activity):
+def get_activity_code(activity:str) -> int:
+    """Get activity code from activity string.
+
+    Args:
+        activity (str): activity name.
+
+    Returns:
+        int: code representation for activity.
+    """
     for i in range(len(activity_label_list)):
         if activity== activity_label_list[i]:
             return i
     return len(activity_label_list)
     
-def get_activity_code_arranged(activity):
+def get_activity_code_arranged(activity:str) -> int:
+    """Arrange activity according mucosal / non-mucosal.
+
+    Args:
+        activity (str): activity name.
+
+    Returns:
+        int: arranged code representation for activity.
+    """
     if activity == mucous_activity_label_list[0]:
         return 0
     elif activity == mucous_activity_label_list[1]:
@@ -51,130 +75,35 @@ def get_activity_code_arranged(activity):
         return 8
     else:
         print(activity,"error")
+        return -1
     
-def get_activity_mucous_code(activity):
+def get_activity_mucous_code(activity:str) -> int:
+    """Return mucous/non-mucous label for activity.
+
+    Args:
+        activity (str): activity name.
+
+    Returns:
+        int: representation code for activity.
+    """
     if activity in mucous_activity_label_list:
         return 1
     elif activity in non_mucous_activity_label_list:
         return 0
     else:
         print("activity error")
-
-def data_preprocessing(df_row,data_length,gyro):
-    accX = df_row[[str(i) for i in range(data_length)]]
-    accX_norm = normalization_minmax(accX)
-    if gyro:
-        return accX,accX_norm,filter_remove_noise(accX)
-    else:
-        return accX,accX_norm,filter_remove_noise(accX),filter_remove_noise_and_gravity(accX)
-    
-def plot_instances(user, activity, session, df, instance_id, data_length, plot=True):
-    new_df = df[(df['userid'] == user) & (df['activity'] == activity) & (df['session'] == session) & (df['instance'] == instance_id)]
-    if len(new_df) < 6:
-        print("data lengh < 6")
-        return
-       
-    instance_df = new_df
-    acc_raw_list = []
-    gyro_raw_list = []
-    
-    acc_denoise_list = []
-    gyro_denoise_list = []
-    acc_denoise_norm_list = []
-    gyro_denoise_norm_list = []
-    
-    acc_denoise_degravity_list = []
-    acc_denoise_degravity_norm_list = []
-    
-    df_row_0 = instance_df.iloc[0,:]
-    df_row_1 = instance_df.iloc[1,:]    
-    df_row_2 = instance_df.iloc[2,:]
-    df_row_3 = instance_df.iloc[3,:]
-    df_row_4 = instance_df.iloc[4,:]
-    df_row_5 = instance_df.iloc[5,:]
-    touching_point = (instance_df["touching point"].iloc[0])
-    leaving_point = (instance_df["leaving point"].iloc[0])
-    print(touching_point,leaving_point)
-    print(instance_df["source"].iloc[0])
-    
-    if df_row_0["axis"]=="Ax": 
-        raw, raw_norm, raw_denoise, raw_denoise_degravity = data_preprocessing(df_row_0,data_length,False)
-        acc_raw_list.append(raw)
-        acc_denoise_list.append(raw_denoise)
-        acc_denoise_norm_list.append(normalization_minmax(raw_denoise))
-        acc_denoise_degravity_list.append(raw_denoise_degravity)
-        acc_denoise_degravity_norm_list.append(normalization_minmax(raw_denoise_degravity))
-
-    if df_row_1["axis"]=="Ay": 
-        raw, raw_norm, raw_denoise, raw_denoise_degravity = data_preprocessing(df_row_1,data_length,False)
-        acc_raw_list.append(raw)
-        acc_denoise_list.append(raw_denoise)
-        acc_denoise_norm_list.append(normalization_minmax(raw_denoise))
-        acc_denoise_degravity_list.append(raw_denoise_degravity)
-        acc_denoise_degravity_norm_list.append(normalization_minmax(raw_denoise_degravity))
-        
-    if df_row_2["axis"]=="Az": 
-        raw, raw_norm, raw_denoise, raw_denoise_degravity = data_preprocessing(df_row_2,data_length,False)
-        acc_raw_list.append(raw)
-        acc_denoise_list.append(raw_denoise)
-        acc_denoise_norm_list.append(normalization_minmax(raw_denoise))
-        acc_denoise_degravity_list.append(raw_denoise_degravity)
-        acc_denoise_degravity_norm_list.append(normalization_minmax(raw_denoise_degravity))
-        
-    if df_row_3["axis"]=="Gx":
-        raw, raw_norm, raw_denoise = data_preprocessing(df_row_3,data_length,True)
-        gyro_raw_list.append(raw)
-        gyro_denoise_list.append(raw_denoise)
-        gyro_denoise_norm_list.append(normalization_minmax(raw_denoise))
-        
-    if df_row_4["axis"]=="Gy": 
-        raw, raw_norm, raw_denoise = data_preprocessing(df_row_4,data_length,True)
-        gyro_raw_list.append(raw)
-        gyro_denoise_list.append(raw_denoise)
-        gyro_denoise_norm_list.append(normalization_minmax(raw_denoise))
-        
-    if df_row_5["axis"]=="Gz": 
-        raw, raw_norm, raw_denoise = data_preprocessing(df_row_5,data_length,True)
-        gyro_raw_list.append(raw)
-        gyro_denoise_list.append(raw_denoise)
-        gyro_denoise_norm_list.append(normalization_minmax(raw_denoise))
-    
-    if plot:
-        x_tick = [i/100 for i in range(data_length)]
-        fig = plt.figure(figsize=(18, 6))
-        fig.suptitle(f'User: {user}, Activity: {activity}, Session: {session}, Instance: {instance_id}', fontsize=12)
-        plt.subplot(2,3,1)
-        plt.plot(x_tick,np.array(acc_raw_list).T.tolist())
-        plt.legend(['Ax','Ay','Az'])
-        plt.subplot(2,3,2)
-        plt.plot(x_tick,np.array(acc_denoise_list).T.tolist())
-        plt.legend(['Ax_denoise','Ay_denoise','Az_denoise'])
-        plt.subplot(2,3,3)
-        plt.plot(x_tick,np.array(acc_denoise_degravity_list).T.tolist())
-        plt.legend(['Ax_denoise_degravity','Ay_denoise_degravity','Az_denoise_degravity'])
-        plt.subplot(2,3,4)
-        plt.plot(x_tick,np.array(gyro_raw_list).T.tolist())
-        plt.legend(['Gx','Gy','Gz'])
-        plt.subplot(2,3,5)
-        plt.plot(x_tick,np.array(gyro_denoise_list).T.tolist())
-        plt.axvspan(touching_point/100, (touching_point+2)/100, facecolor='r', alpha=1)
-        plt.axvspan(leaving_point/100, (leaving_point+2)/100, facecolor='b', alpha=1)
-        plt.legend(['Gx_denoise','Gy_denoise','Gz_denoise'])
-        plt.show()
-        
-        plt.figure(figsize=(12, 6))
-        plt.plot(x_tick,np.array(gyro_denoise_list).T.tolist())
-        plt.legend(['Gx','Gy','Gz'])
-        plt.ylabel("degrees per second")
-        plt.xlabel("time (second)")
-        plt.show()
-    return acc_raw_list, acc_denoise_norm_list, acc_denoise_degravity_norm_list, gyro_raw_list, gyro_denoise_norm_list
+        return -1
 
 class Dataset:
+    """Dataset represent a sorted / processed dataframe.
     """
-    The imu file should be a .csv file and label file should be .xlss file
-    """
-    def __init__(self, imu_file_name, label_file_name):
+    def __init__(self, imu_file_name:str, label_file_name:str):
+        """Initialize dataset with imu file and label file.
+
+        Args:
+            imu_file_name (str): file path to IMU file.
+            label_file_name (str): file path to label file.
+        """
         self.df_facetouch_imu = pd.read_csv(imu_file_name, index_col=[0])
         # Remove Cover Mouth
         # re-arrange activities
@@ -206,8 +135,17 @@ class Dataset:
         self.df_facetouch_imu_sorted = self.df_facetouch_imu_sorted.replace("Touch chin","[None-M]Touch chin")
         print("Label replaced")
 
+        def get_sorted_df(self) -> pd.DataFrame:
+            """Extract the dataframe constructed from the imu file and label file
+
+            Returns:
+                pd.DataFrame: result data frame
+            """
+            return self.df_facetouch_imu_sorted
         
     def check_original_sorted_df(self):
+        """Check whether the dataframe is correct after sorting.
+        """
         print('Below should show equal number: ')
         print(len(self.df_facetouch_imu))
         print(len(self.df_facetouch_imu_sorted))
@@ -215,9 +153,13 @@ class Dataset:
 
         
     def check_label_length(self):
+        """Check the length for label file.
+        """
         print(len(self.df_facetouching_point_labeling))
     
     def print_dataset_statistic(self):
+        """print out the statistic for dataset.
+        """
         print("#Users",len(self.df_facetouch_imu_sorted["userid"].unique()))
         print("#Activity",len(self.df_facetouch_imu_sorted["activity"].unique()))
         print("Activity",(self.df_facetouch_imu_sorted["activity"].unique()))
@@ -225,14 +167,15 @@ class Dataset:
         for activity in self.df_facetouch_imu_sorted["activity"].unique():
             print("#Instance",activity,len(self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted["activity"]==activity])/6)
     
-    def get_sorted_df(self):
-        return self.df_facetouch_imu_sorted
-    
 class DataGenerator:
-    '''
-    Initialize with a raw data frame
-    '''
-    def __init__(self, df):
+    """Generate data for training purpose.
+    """
+    def __init__(self, df:pd.DataFrame):
+        """Initialize data generator with a processed data frame
+        
+        Args:
+            df (pd.DataFrame): raw data in dataframe format
+        """
         self.df = df
         self.imu_instance_list = []
         self.imu_instance_normalized_list = []
@@ -250,19 +193,33 @@ class DataGenerator:
     Note: Pretouch only must be true if predicting t
     Set data following length to 0 for non-forcasting task
     
-    data_length: Length of the input data
-    step_size: step size for sliding window
-    data_following_length: Forcasted target length
-    session_exclude: exclude 1 to exclude unguided, set to 0 if want to include unguided
-    source_include: include the source of label
-    user_exclude: leave a user out
-    for_test: for leave one-user-out test or not
-    user_only: include the user for test
-    pre_touch_only: only extracting pre_touch window or not
+    data_length: Length of the input data.
+    step_size: step size for sliding window.
+    data_following_length: Forcasted target length.
+    session_exclude: exclude 1 to exclude unguided, set to 0 if want to include unguided.
+    source_include: include the source of label.
+    user_exclude: leave a user out.
+    for_test: for leave one-user-out test or not.
+    user_only: include the user for test.
+    pre_touch_only: only extracting pre_touch window or not.
     '''
-    def generate_data(self, data_length,step_size, window_num, data_following_length, 
-                      session_exclude = 1, source_include = ['video'], 
-                      user_exclude = -1, for_test = False, user_only = -1, pre_touch_only = True):
+    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, 
+                      session_exclude:int = 1, source_include: list = ['video'], 
+                      user_exclude:int = -1, for_test: bool = False, user_only:int = -1, pre_touch_only: bool = True):
+        """Produce data for different purpose and stored in the object
+
+        Args:
+            data_length (int): length of a sliding window
+            step_size (int): step size of the generating process
+            window_num (int): target number of window
+            data_following_length (int): target forcasted signal length for a window
+            session_exclude (int, optional): excluded session. Defaults to 1.
+            source_include (list, optional): included source. Defaults to ['video'].
+            user_exclude (int, optional): excluded user. Defaults to -1.
+            for_test (bool, optional): the generation is for testing or not. Defaults to False.
+            user_only (int, optional): target user. Defaults to -1.
+            pre_touch_only (bool, optional): create window only for pre-touching or not. Defaults to True.
+        """
         assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
 
         for i in range(int(len(self.df) / 6)):
@@ -376,20 +333,37 @@ class DataGenerator:
     '''
     Get the data and target 
     '''            
-    def get_list_for_forcasting(self):
+    def get_list_for_forcasting(self) -> tuple:
+        """Get training data for time series forcasting task.
+
+        Returns:
+            tuple: raw series, forcasted target seris.
+        """
         assert len(self.imu_instance_list) != 0 and len(self.imu_instance_following_list) != 0
         return self.imu_instance_list, self.imu_instance_following_list
     
-    def get_list_for_classification(self):
+    def get_list_for_classification(self) -> tuple:
+        """Get training data for classification task.
+
+        Returns:
+            tuple: raw series and labels (raw label and mucous label).
+        """
         assert len(self.imu_instance_list) != 0 and len(self.label_list) != 0 and len(self.label_list) != 0
         return self.imu_instance_list, self.label_list, self.label_mucous_list
     
-    def get_list_for_time_prediction(self):
+    def get_list_for_time_prediction(self) -> tuple:
+        """Get training data for touching time prediction.
+
+        Returns:
+            tuple: raw series and time to touch label.
+        """
         assert len(self.imu_instance_list) != 0 and len(self.time_to_touch_list) != 0
         return self.imu_instance_list, self.time_to_touch_list
     
     # Reset all list
     def reset(self):
+        """reset the generated data.
+        """
         self.imu_instance_list = []
         self.imu_instance_normalized_list = []
         self.label_list = []

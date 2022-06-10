@@ -142,6 +142,9 @@ class Dataset:
                 pd.DataFrame: result data frame
             """
             return self.df_facetouch_imu_sorted
+    
+    def get_sorted_df(self):
+        return self.df_facetouch_imu_sorted
         
     def check_original_sorted_df(self):
         """Check whether the dataframe is correct after sorting.
@@ -150,8 +153,8 @@ class Dataset:
         print(len(self.df_facetouch_imu))
         print(len(self.df_facetouch_imu_sorted))
         if len(self.df_facetouch_imu)==len(self.df_facetouch_imu_sorted): print("session right")
-
-        
+    
+    
     def check_label_length(self):
         """Check the length for label file.
         """

@@ -1,5 +1,6 @@
 from filters import filter_remove_noise, filter_remove_noise_and_gravity, normalization_minmax, normalization_standard
 import matplotlib.pyplot as plt
+import numpy as np
 
 def data_preprocessing(df_row,data_length,gyro):
     accX = df_row[[str(i) for i in range(data_length)]]

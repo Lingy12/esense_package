@@ -29,6 +29,30 @@ class Model:
         self.logging_path = f'/my_checkpoint/{model_name}'
         self.logging_dir = os.path.dirname(self.logging_path)
     
+    def init_1d_cnn_model(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
+                                        feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2):
+        """Initialize the model with 1d cnn structure.
+
+        Args:
+            filters_num (int): number of filters for each layer.
+            kernel_size (int): kernel_size for each layer.
+            input_shape (int): shape of the input data.
+            output_size (int): size of output unit.
+            feature_num (int, optional): number of feature extracted from 1d cnn (second last layer). Defaults to 100.
+            dropout_rate (int, optional): dropout rate. Defaults to 0.5.
+            pool_size (int, optional): size of the pooling layer. Defaults to 2.
+        """
+        model = Sequential()
+        model.add(Conv1D(filters=filters_num, kernel_size=kernel_size, activation='relu', 
+                        input_shape=input_shape))
+        model.add(Conv1D(filters=filters_num, kernel_size=kernel_size, activation='relu'))
+        model.add(Dropout(dropout_rate))
+        model.add(MaxPooling1D(pool_size=pool_size))
+        model.add(Flatten())
+        model.add(Dense(feature_num, activation='relu'))
+        model.add(Dense(output_size, activation='softmax'))
+        self.model = model
+        
     def fit(self, x, y, **kwargs):
         """Fit the model using tensorflow fit function.
         """
@@ -58,29 +82,5 @@ class Model:
         """
         assert self.model != None
         self.model.summary()
-    
-    def init_1d_cnn_model(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
-                                        feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2):
-        """Initialize the model with 1d cnn structure.
-
-        Args:
-            filters_num (int): number of filters for each layer.
-            kernel_size (int): kernel_size for each layer.
-            input_shape (int): shape of the input data.
-            output_size (int): size of output unit.
-            feature_num (int, optional): number of feature extracted from 1d cnn (second last layer). Defaults to 100.
-            dropout_rate (int, optional): dropout rate. Defaults to 0.5.
-            pool_size (int, optional): size of the pooling layer. Defaults to 2.
-        """
-        model = Sequential()
-        model.add(Conv1D(filters=filters_num, kernel_size=kernel_size, activation='relu', 
-                        input_shape=input_shape))
-        model.add(Conv1D(filters=filters_num, kernel_size=kernel_size, activation='relu'))
-        model.add(Dropout(dropout_rate))
-        model.add(MaxPooling1D(pool_size=pool_size))
-        model.add(Flatten())
-        model.add(Dense(feature_num, activation='relu'))
-        model.add(Dense(output_size, activation='softmax'))
-        self.model = model
     
     # Add more model

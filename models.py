@@ -3,7 +3,7 @@ models.py
 =================================
 This is the module for models usage and training pipeline
 """
-
+import os
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
@@ -26,11 +26,19 @@ class Model:
         self.model = None
         self.model_name = model_name
         self.log = log
+        self.logging_path = f'/my_checkpoint/{model_name}'
+        self.logging_dir = os.path.dirname(self.logging_path)
     
     def fit(self, x, y, **kwargs):
         """Fit the model using tensorflow fit function.
         """
         assert self.model != None
+        if log == True:
+            cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+            kwargs['callbacks'].append(cp_callback)
+        
         self.model.fit(x, y, **kwargs)
     
     def evaluate(self, x, y, **kwargs):

@@ -33,7 +33,7 @@ class Model:
         """Fit the model using tensorflow fit function.
         """
         assert self.model != None
-        if log == True:
+        if self.log == True:
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1)

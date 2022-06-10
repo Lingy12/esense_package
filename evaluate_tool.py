@@ -8,6 +8,7 @@ from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay,accuracy_sco
 from sklearn.metrics import classification_report
 import numpy as np
 import matplotlib.pyplot as plt 
+import numpy as np
 
 
 def get_confusionmatrix(y_pred:np.array, y_true:np.array, classes_list:list, title:str, 
@@ -22,8 +23,6 @@ def get_confusionmatrix(y_pred:np.array, y_true:np.array, classes_list:list, tit
         save_fig (bool, optional): save the figure or not. Defaults to False.
         save_path (str, optional): path to save the graph. Defaults to "".
     """
-    if user == -1:
-        user = ""
     cm = confusion_matrix( np.argmax(y_true,axis=1), np.argmax(y_pred,axis=1))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm,display_labels=classes_list)
     disp.plot(xticks_rotation='vertical')

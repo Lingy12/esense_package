@@ -34,7 +34,7 @@ class Model:
         """
         assert self.model != None
         if self.log == True:
-            cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+            cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.logging_dir,
                                                  save_weights_only=True,
                                                  verbose=1)
             kwargs['callbacks'].append(cp_callback)

@@ -147,6 +147,10 @@ class Model:
         assert self.model != None
         self.model.compile(**kwargs)
     
+    def predict(self, x, **kwargs):
+        assert self.model != None
+        return self.model.predict(x, **kwargs)
+    
     def print_model(self):
         """Print out the model structure.
         """

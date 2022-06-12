@@ -225,7 +225,7 @@ class Dataset:
             source (str): source of the data
             session (int): session of the data
         """
-        self.df_facetouch_imu_sorted = self.df_facetouch_imu_sorted[(self.df_facetouch_imu_sorted['session'].isin(session)) & self.df_facetouch_imu_sorted['source'].isin(source)]
+        self.df_facetouch_imu_sorted = self.df_facetouch_imu_sorted[(self.df_facetouch_imu_sorted['session'].isin(session)) & self.df_facetouch_imu_sorted['source'].isin(source)].reset_index()
         
 class DataGenerator:
     """Generate data for training purpose.

@@ -13,6 +13,23 @@ from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import MaxPooling1D
 from tensorflow.keras.layers import BatchNormalization, Activation, Conv1DTranspose,concatenate, add
 
+def conv1d_block(input_tensor, n_filters, kernel_size = 3, batchnorm = True):
+    """Function to add 2 convolutional layers with the parameters passed to it"""
+    # first layer
+    x = Conv1D(filters = n_filters, kernel_size = kernel_size,\
+            kernel_initializer = 'he_normal', padding = 'same')(input_tensor)
+    if batchnorm:
+        x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    
+    # second layer
+    x = Conv1D(filters = n_filters, kernel_size = kernel_size,\
+            kernel_initializer = 'he_normal', padding = 'same')(x)
+    if batchnorm:
+        x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    
+    return x
 
 class Model:
     """Represent a model for training
@@ -53,24 +70,6 @@ class Model:
         model.add(Dense(feature_num, activation='relu'))
         model.add(Dense(output_size, activation='softmax'))
         self.model = model
-    
-    def conv1d_block(self, input_tensor, n_filters, kernel_size = 3, batchnorm = True):
-        """Function to add 2 convolutional layers with the parameters passed to it"""
-        # first layer
-        x = Conv1D(filters = n_filters, kernel_size = kernel_size,\
-                kernel_initializer = 'he_normal', padding = 'same')(input_tensor)
-        if batchnorm:
-            x = BatchNormalization()(x)
-        x = Activation('relu')(x)
-        
-        # second layer
-        x = Conv1D(filters = n_filters, kernel_size = kernel_size,\
-                kernel_initializer = 'he_normal', padding = 'same')(x)
-        if batchnorm:
-            x = BatchNormalization()(x)
-        x = Activation('relu')(x)
-        
-        return x
     
     def get_unet(self, input_imu, output_unit = -1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True):
         """Function to define the UNET Model"""

@@ -11,7 +11,7 @@ from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import MaxPooling1D
-from tensorflow.keras.layers import BatchNormalization, Activation
+from tensorflow.keras.layers import BatchNormalization, Activation, Conv1DTranspose,concatenate, add
 
 
 class Model:
@@ -54,7 +54,7 @@ class Model:
         model.add(Dense(output_size, activation='softmax'))
         self.model = model
     
-    def conv1d_block(input_tensor, n_filters, kernel_size = 3, batchnorm = True):
+    def conv1d_block(self, input_tensor, n_filters, kernel_size = 3, batchnorm = True):
         """Function to add 2 convolutional layers with the parameters passed to it"""
         # first layer
         x = Conv1D(filters = n_filters, kernel_size = kernel_size,\
@@ -72,7 +72,7 @@ class Model:
         
         return x
     
-    def get_unet(input_imu, output_unit = -1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True):
+    def get_unet(self, input_imu, output_unit = -1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True):
         """Function to define the UNET Model"""
         # Contracting Path
         c1 = conv1d_block(input_imu, n_filters * 1, kernel_size = 3, batchnorm = batchnorm)

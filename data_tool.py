@@ -203,8 +203,6 @@ class Dataset:
         print(len(self.df_facetouch_imu_sorted))
         if len(self.df_facetouch_imu)==len(self.df_facetouch_imu_sorted): print("session right")
     
-    
-    
     def check_label_length(self):
         """Check the length for label file.
         """
@@ -220,9 +218,6 @@ class Dataset:
         for activity in self.df_facetouch_imu_sorted["activity"].unique():
             print("#Instance",activity,len(self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted["activity"]==activity])/6)
     
-    def split_train_test(self):
-        """Split the sorted df to train and test data frame
-        """
         
 class DataGenerator:
     """Generate data for training purpose.

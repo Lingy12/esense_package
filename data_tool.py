@@ -8,6 +8,7 @@ import time
 import numpy as np
 from .filters import filter_remove_noise, normalization_minmax, filter_remove_noise_and_gravity
 import matplotlib as plt
+from sklearn.model_selection import train_test_split
 
 mucous_activity_label_list = ['[Mucosal]Rub eyes (L)',
                               '[Mucosal]Rub eyes (R)',
@@ -134,18 +135,66 @@ class Dataset:
         self.df_facetouch_imu_sorted = self.df_facetouch_imu_sorted.replace("Touch cheek_Right","[None-M]Touch cheek (R)")
         self.df_facetouch_imu_sorted = self.df_facetouch_imu_sorted.replace("Touch chin","[None-M]Touch chin")
         print("Label replaced")
+        self.train_df = None
+        self.test_df = None
+        self.total_instance = len(self.df_facetouch_imu_sorted) / 6 # six axis
+        #total 2028 instance
 
-        def get_sorted_df(self) -> pd.DataFrame:
-            """Extract the dataframe constructed from the imu file and label file
+    def get_sorted_df(self) -> pd.DataFrame:
+        """Extract the dataframe constructed from the imu file and label file
 
-            Returns:
-                pd.DataFrame: result data frame
-            """
-            return self.df_facetouch_imu_sorted
-    
-    def get_sorted_df(self):
+        Returns:
+            pd.DataFrame: result data frame
+        """
         return self.df_facetouch_imu_sorted
+    
+    def get_train_df(self) -> pd.DataFrame:
+        """Return the train data frame.
+
+        Returns:
+            pd.DataFrame: train data frame.
+        """
+        return self.train_df
+
+    def get_test_df(self) -> pd.DataFrame:
+        """Return the test data frame
+
+        Returns:
+            pd.DataFrame: test data frame
+        """
+        return self.test_df
+    
+    def deploy_leave_user(self, userid:int):
+        """Support for leave one user out
+
+        Args:
+            userid (int): user id
+        """
+        assert userid in self.df_facetouch_imu_sorted['userid'].unique()
+        self.train_df = self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted['userid'] != userid]
+        self.test_df = self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted['userid'] == userid]
+    
+    def deploy_train_test_split(self, test_size: float):
+        """Train test split the data frame
+
+        Args:
+            test_size (float): size for test
+        """
         
+        index_train, index_test = train_test_split(self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted['axis'] == 'Ax'].index)
+        index_train, index_test = list(index_train), list(index_test)
+        
+        train_size = len(index_train)
+        test_size = len(index_test)
+        for i in range(1,6):
+            for j in range(train_size):
+                index_train.append(index_train[j] + i)
+            for k in range(test_size):
+                index_test.append(index_test[k] + i)
+        
+        self.train_df = self.df_facetouch_imu_sorted.iloc[index_train].sort_values(by=['userid','activity','session','timestamp','axis']).reset_index(drop=True)
+        self.test_df = self.df_facetouch_imu_sorted.iloc[index_test].sort_values(by=['userid','activity','session','timestamp','axis']).reset_index(drop=True)            
+    
     def check_original_sorted_df(self):
         """Check whether the dataframe is correct after sorting.
         """
@@ -153,7 +202,6 @@ class Dataset:
         print(len(self.df_facetouch_imu))
         print(len(self.df_facetouch_imu_sorted))
         if len(self.df_facetouch_imu)==len(self.df_facetouch_imu_sorted): print("session right")
-    
     
     def check_label_length(self):
         """Check the length for label file.
@@ -170,6 +218,15 @@ class Dataset:
         for activity in self.df_facetouch_imu_sorted["activity"].unique():
             print("#Instance",activity,len(self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted["activity"]==activity])/6)
     
+    def filter_source_session(self, source:list, session: list):
+        """Filter the dataframe according to session and source
+
+        Args:
+            source (str): source of the data
+            session (int): session of the data
+        """
+        self.df_facetouch_imu_sorted[(self.df_facetouch_imu_sorted['session'].isin(session)) & self.df_facetouch_imu_sorted['source'].isin(source)]
+        
 class DataGenerator:
     """Generate data for training purpose.
     """
@@ -206,9 +263,7 @@ class DataGenerator:
     user_only: include the user for test.
     pre_touch_only: only extracting pre_touch window or not.
     '''
-    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, 
-                      session_exclude:int = 1, source_include: list = ['video'], 
-                      user_exclude:int = -1, for_test: bool = False, user_only:int = -1, pre_touch_only: bool = True):
+    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, pre_touch_only: bool = True):
         """Produce data for different purpose and stored in the object
 
         Args:
@@ -216,27 +271,22 @@ class DataGenerator:
             step_size (int): step size of the generating process
             window_num (int): target number of window
             data_following_length (int): target forcasted signal length for a window
-            session_exclude (int, optional): excluded session. Defaults to 1.
-            source_include (list, optional): included source. Defaults to ['video'].
-            user_exclude (int, optional): excluded user. Defaults to -1.
-            for_test (bool, optional): the generation is for testing or not. Defaults to False.
-            user_only (int, optional): target user. Defaults to -1.
-            pre_touch_only (bool, optional): create window only for pre-touching or not. Defaults to True.
+
         """
-        assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
+        # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
 
         for i in range(int(len(self.df) / 6)):
             df_row_0 = self.df.iloc[i * 6, :]
             
-            # Controlling for target
-            if df_row_0['session'] == session_exclude:
-                continue
-            if df_row_0['source'] not in source_include:
-                continue
-            if df_row_0['userid'] == user_exclude and not for_test :
-                continue
-            if for_test and user_only != df_row_0['userid']:
-                continue
+            # # Controlling for target
+            # if df_row_0['session'] == session_exclude:
+            #     continue
+            # if df_row_0['source'] not in source_include:
+            #     continue
+            # if df_row_0['userid'] == user_exclude and not for_test :
+            #     continue
+            # if for_test and user_only != df_row_0['userid']:
+            #     continue
             
             # Get touching point
             touch_touching_point = int(df_row_0['touching point'])

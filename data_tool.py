@@ -271,11 +271,22 @@ class DataGenerator:
             step_size (int): step size of the generating process
             window_num (int): target number of window
             data_following_length (int): target forcasted signal length for a window
+
         """
-        assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
+        # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
 
         for i in range(int(len(self.df) / 6)):
             df_row_0 = self.df.iloc[i * 6, :]
+            
+            # # Controlling for target
+            # if df_row_0['session'] == session_exclude:
+            #     continue
+            # if df_row_0['source'] not in source_include:
+            #     continue
+            # if df_row_0['userid'] == user_exclude and not for_test :
+            #     continue
+            # if for_test and user_only != df_row_0['userid']:
+            #     continue
             
             # Get touching point
             touch_touching_point = int(df_row_0['touching point'])

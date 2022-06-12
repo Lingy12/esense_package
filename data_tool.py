@@ -193,8 +193,8 @@ class Dataset:
                 index_test.append(index_test[k] + i)
         
         self.train_df = self.df_facetouch_imu_sorted.iloc[index_train].sort_values(by=['userid','activity','session','timestamp','axis']).reset_index(drop=True)
-        self.test_df = self.df_facetouch_imu_sorted.iloc[index_test].sort_values(by=['userid','activity','session','timestamp','axis']).reset_index(drop=True)
-             
+        self.test_df = self.df_facetouch_imu_sorted.iloc[index_test].sort_values(by=['userid','activity','session','timestamp','axis']).reset_index(drop=True)            
+    
     def check_original_sorted_df(self):
         """Check whether the dataframe is correct after sorting.
         """
@@ -218,6 +218,14 @@ class Dataset:
         for activity in self.df_facetouch_imu_sorted["activity"].unique():
             print("#Instance",activity,len(self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted["activity"]==activity])/6)
     
+    def filter_source_session(self, source:list, session: list):
+        """Filter the dataframe according to session and source
+
+        Args:
+            source (str): source of the data
+            session (int): session of the data
+        """
+        self.df_facetouch_imu_sorted[(self.df_facetouch_imu_sorted['session'].isin(session)) & self.df_facetouch_imu_sorted['source'].isin(source)]
         
 class DataGenerator:
     """Generate data for training purpose.

@@ -11,6 +11,8 @@ from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import MaxPooling1D
+from tensorflow.keras.layers import BatchNormalization, Activation
+
 
 class Model:
     """Represent a model for training

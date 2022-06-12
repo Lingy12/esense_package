@@ -263,9 +263,7 @@ class DataGenerator:
     user_only: include the user for test.
     pre_touch_only: only extracting pre_touch window or not.
     '''
-    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, 
-                      session_exclude:int = 1, source_include: list = ['video'], 
-                      user_exclude:int = -1, for_test: bool = False, user_only:int = -1, pre_touch_only: bool = True):
+    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, pre_touch_only: bool = True):
         """Produce data for different purpose and stored in the object
 
         Args:
@@ -273,27 +271,11 @@ class DataGenerator:
             step_size (int): step size of the generating process
             window_num (int): target number of window
             data_following_length (int): target forcasted signal length for a window
-            session_exclude (int, optional): excluded session. Defaults to 1.
-            source_include (list, optional): included source. Defaults to ['video'].
-            user_exclude (int, optional): excluded user. Defaults to -1.
-            for_test (bool, optional): the generation is for testing or not. Defaults to False.
-            user_only (int, optional): target user. Defaults to -1.
-            pre_touch_only (bool, optional): create window only for pre-touching or not. Defaults to True.
         """
         assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
 
         for i in range(int(len(self.df) / 6)):
             df_row_0 = self.df.iloc[i * 6, :]
-            
-            # Controlling for target
-            if df_row_0['session'] == session_exclude:
-                continue
-            if df_row_0['source'] not in source_include:
-                continue
-            if df_row_0['userid'] == user_exclude and not for_test :
-                continue
-            if for_test and user_only != df_row_0['userid']:
-                continue
             
             # Get touching point
             touch_touching_point = int(df_row_0['touching point'])

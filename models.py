@@ -47,7 +47,7 @@ class Model:
         self.logging_path = f'/my_checkpoint/{model_name}'
         self.logging_dir = os.path.dirname(self.logging_path)
     
-    def init_1d_cnn_model(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
+    def __init_1d_cnn_model(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
                                         feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2):
         """Initialize the model with 1d cnn structure.
 
@@ -71,7 +71,7 @@ class Model:
         model.add(Dense(output_size, activation='softmax'))
         self.model = model
     
-    def get_unet(self, input_imu, output_unit = -1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True):
+    def __get_unet(self, input_imu, output_unit = -1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True):
         """Function to define the UNET Model"""
         # Contracting Path
         c1 = conv1d_block(input_imu, n_filters * 1, kernel_size = 3, batchnorm = batchnorm)
@@ -118,9 +118,6 @@ class Model:
         if not for_segamentation:
             outputs = Dense(output_unit)
         model = Model(inputs=[input_imu], outputs=[outputs])
-        
-    #     model = Model(inputs=[input_imu], outputs=[c5])
-        
         return model
     
     def fit(self, x, y, **kwargs):
@@ -158,3 +155,13 @@ class Model:
         self.model.summary()
     
     # Add more model
+    def init_forcasting_model(self, input_length, output_length):
+        """Initialize model for forcasting task
+        """
+        self.init_1d_cnn_model(64, 3, input_shape=(input_length, 6), output_size=output_length)
+    
+    def init_unet(self, input_imu):
+        self.model = self.__get_unet(input_imu=input_imu)
+    
+    def init_classification_model(self, input_shape, output_size):
+        self.__init_1d_cnn_model(64, 3, input_shape=input_shape, output_size=output_size)

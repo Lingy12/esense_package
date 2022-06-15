@@ -263,7 +263,7 @@ class DataGenerator:
     user_only: include the user for test.
     pre_touch_only: only extracting pre_touch window or not.
     '''
-    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, pre_touch_only: bool = True):
+    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, pre_touch_only: bool = False):
         """Produce data for different purpose and stored in the object
 
         Args:
@@ -274,7 +274,6 @@ class DataGenerator:
 
         """
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
-
         for i in range(int(len(self.df) / 6)):
             df_row_0 = self.df.iloc[i * 6, :]
             
@@ -290,7 +289,7 @@ class DataGenerator:
             
             # Get touching point
             touch_touching_point = int(df_row_0['touching point'])
-            if touch_touching_point<data_length or touch_touching_point>400:
+            if touch_touching_point>400:
                 print("touching point label error")
                 continue
             
@@ -310,7 +309,7 @@ class DataGenerator:
                 if data_start < 20:
                     print("start data point out of boundry!", i, j)
                     continue
-                if data_end >= 400:
+                if data_end > 400:
                     print("end data point out of boundry!", i, j)
                     
                 if df_row_0["axis"]=="Ax": 

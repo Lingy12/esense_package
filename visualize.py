@@ -1,4 +1,4 @@
-from filters import filter_remove_noise, filter_remove_noise_and_gravity, normalization_minmax, normalization_standard
+from .filters import filter_remove_noise, filter_remove_noise_and_gravity, normalization_minmax, normalization_standard
 import matplotlib.pyplot as plt
 import numpy as np
 

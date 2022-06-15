@@ -31,6 +31,17 @@ def get_confusionmatrix(y_pred:np.array, y_true:np.array, classes_list:list, tit
     if save_fig:
         plt.savefig(save_path)
 
+def derive_mucosal(y_pred, y_true):
+    """Derive mucosal label.
+
+    Args:
+        y_pred (np.array): predicted label.
+        y_true (np.array): ture label.
+    """
+    y_pred_mucosal = [0 if np.argmax(y)<5 else 1 for y in y_pred]
+    y_true_mucosal = [0 if np.argmax(y)<5 else 1 for y in y_true]
+    return y_pred_mucosal, y_true_mucosal   
+    
 def get_derived_mucosal(y_pred: np.array, y_true: np.array, title: str, 
                        save_fig: bool = False, save_path: bool = ""):
     """Generate confusion matrix for mucous / Non-Mucous prediction

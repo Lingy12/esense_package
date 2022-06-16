@@ -180,8 +180,8 @@ class Dataset:
         Args:
             test_size (float): size for test
         """
-        
-        index_train, index_test = train_test_split(self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted['axis'] == 'Ax'].index)
+        temp_df = self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted['axis'] == 'Ax']
+        index_train, index_test = train_test_split(temp_df.index, stratify= temp_df['activity'])
         index_train, index_test = list(index_train), list(index_test)
         
         train_size = len(index_train)

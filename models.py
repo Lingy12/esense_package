@@ -44,7 +44,7 @@ class Model:
         self.model = None
         self.model_name = model_name
         self.log = log
-        self.logging_path = f'/my_checkpoint/{model_name}'
+        self.logging_path = f'./my_checkpoint/{model_name}'
         self.logging_dir = os.path.dirname(self.logging_path)
     
     def init_1d_cnn_model(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
@@ -125,10 +125,13 @@ class Model:
         """
         assert self.model != None
         if self.log == True:
-            cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.logging_dir,
+            cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.logging_path,
                                                  save_weights_only=True,
-                                                 verbose=1)
-            kwargs['callbacks'].append(cp_callback)
+                                                 verbose=1, save_best_only=True)
+            if kwargs.__contains__('callback'):
+                kwargs['callbacks'].append(cp_callback)
+            else:
+                kwargs['callbacks'] = [cp_callback]
         
         self.model.fit(x, y, **kwargs)
     
@@ -165,3 +168,6 @@ class Model:
     
     def init_classification_model(self, input_shape, output_size):
         self.init_1d_cnn_model(64, 3, input_shape=input_shape, output_size=output_size)
+        
+    def get_best_model(self):
+        self.model.load_weights(self.logging_path)

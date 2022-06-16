@@ -47,7 +47,7 @@ class Model:
         self.logging_path = f'/my_checkpoint/{model_name}'
         self.logging_dir = os.path.dirname(self.logging_path)
     
-    def __init_1d_cnn_model(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
+    def init_1d_cnn_model(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
                                         feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2):
         """Initialize the model with 1d cnn structure.
 
@@ -164,4 +164,4 @@ class Model:
         self.model = self.__get_unet(input_imu=input_imu)
     
     def init_classification_model(self, input_shape, output_size):
-        self.__init_1d_cnn_model(64, 3, input_shape=input_shape, output_size=output_size)
+        self.init_1d_cnn_model(64, 3, input_shape=input_shape, output_size=output_size)

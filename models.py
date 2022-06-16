@@ -164,4 +164,4 @@ class Model:
         self.model = self.__get_unet(input_imu=input_imu)
     
     def init_classification_model(self, input_shape, output_size):
-        self.__init_1d_cnn_model(16, 10, input_shape=input_shape, output_size=output_size)
+        self.__init_1d_cnn_model(64, 3, input_shape=input_shape, output_size=output_size)

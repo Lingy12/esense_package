@@ -311,7 +311,13 @@ class DataGenerator:
                     continue
                 if data_end > 400:
                     print("end data point out of boundry!", i, j)
-                    
+                    continue
+                
+                # Ensure the overlapping of touching point
+                if data_start > touch_touching_point or data_end < touch_touching_point:
+                    # print('Skipping non-overlapping')
+                    continue
+                
                 if df_row_0["axis"]=="Ax": 
                     accX = df_row_0[[str(i) for i in range(data_start,data_end)]]
                     accX_f = filter_remove_noise_and_gravity(accX)

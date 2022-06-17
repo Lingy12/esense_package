@@ -181,7 +181,7 @@ class Dataset:
             test_size (float): size for test
         """
         temp_df = self.df_facetouch_imu_sorted[self.df_facetouch_imu_sorted['axis'] == 'Ax']
-        index_train, index_test = train_test_split(temp_df.index, stratify= temp_df['activity'])
+        index_train, index_test = train_test_split(temp_df.index, stratify= temp_df['activity'], test_size=test_size, train_size=1-test_size)
         index_train, index_test = list(index_train), list(index_test)
         
         train_size = len(index_train)

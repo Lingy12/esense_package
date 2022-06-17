@@ -314,7 +314,7 @@ class DataGenerator:
                     continue
                 
                 # Ensure the overlapping of touching point
-                if data_start > touch_touching_point or data_end < touch_touching_point:
+                if data_end < touch_touching_point:
                     # print('Skipping non-overlapping')
                     continue
                 

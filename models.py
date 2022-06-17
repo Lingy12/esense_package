@@ -121,13 +121,14 @@ class Model:
         model = Model(inputs=[input_imu], outputs=[outputs])
         return model
     
-    def fit(self, x, y, **kwargs):
+    def fit(self, x, y, criteria:str = 'val_accuracy',  **kwargs):
         """Fit the model using tensorflow fit function.
         """
         assert self.model != None
         if self.log == True:
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.logging_path,
                                                  save_weights_only=True,
+                                                 monitor = criteria,
                                                  verbose=1, save_best_only=True)
             if kwargs.__contains__('callback'):
                 kwargs['callbacks'].append(cp_callback)

@@ -12,6 +12,7 @@ from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import MaxPooling1D
 from tensorflow.keras.layers import BatchNormalization, Activation, Conv1DTranspose,concatenate, add
+from tensorflow.keras.regularizers import L1, L2, L1L2
 
 def conv1d_block(input_tensor, n_filters, kernel_size = 3, batchnorm = True):
     """Function to add 2 convolutional layers with the parameters passed to it"""
@@ -133,7 +134,8 @@ class Model:
             else:
                 kwargs['callbacks'] = [cp_callback]
         
-        self.model.fit(x, y, **kwargs)
+        hist = self.model.fit(x, y, **kwargs)
+        return hist
     
     def evaluate(self, x, y, **kwargs):
         """Evaluate the model using tensorflow evaluate function.
@@ -171,3 +173,27 @@ class Model:
         
     def get_best_model(self):
         self.model.load_weights(self.logging_path)
+        
+    def init_1d_cnn_model_regularized(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
+                                    feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, regularize_ratio: float = 0.001):
+        """Initialize the model with 1d cnn structure.
+
+        Args:
+            filters_num (int): number of filters for each layer.
+            kernel_size (int): kernel_size for each layer.
+            input_shape (int): shape of the input data.
+            output_size (int): size of output unit.
+            feature_num (int, optional): number of feature extracted from 1d cnn (second last layer). Defaults to 100.
+            dropout_rate (int, optional): dropout rate. Defaults to 0.5.
+            pool_size (int, optional): size of the pooling layer. Defaults to 2.
+        """
+        model = Sequential()
+        model.add(Conv1D(filters=filters_num, kernel_size=kernel_size, activation='relu', 
+                        input_shape=input_shape, kernel_regularizer=L2(regularize_ratio)))
+        model.add(Conv1D(filters=filters_num, kernel_size=kernel_size, activation='relu', kernel_regularizer=L2(regularize_ratio)))
+        model.add(Dropout(dropout_rate))
+        model.add(MaxPooling1D(pool_size=pool_size))
+        model.add(Flatten())
+        model.add(Dense(feature_num, activation='relu', kernel_regularizer=L2(regularize_ratio)))
+        model.add(Dense(output_size, activation='softmax', kernel_regularizer=L2(regularize_ratio)))
+        self.model = model

@@ -248,6 +248,17 @@ class DataGenerator:
         self.window_id_list = []
         self.imu_instance_following_list = []
         self.time_to_touch_list = []
+        
+        # Filter the dataframe
+        self.raw_arr = self.df[[str(i) for i in range(400)]].to_numpy()
+        
+        for i in range(len(self.raw_arr)):
+            if i % 6 < 3:
+                self.raw_arr[i][20:] = filter_remove_noise_and_gravity(self.raw_arr[i][20:])
+            else:
+                self.raw_arr[i][20:] = filter_remove_noise(self.raw_arr[i][20:])
+            
+        self.df[[str(i) for i in range(400)]] = self.raw_arr
     
     '''
     Generate the data
@@ -275,10 +286,8 @@ class DataGenerator:
 
         """
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
-        axis_map = {0:'Ax', 1:'Ay', 2:'Az', 3:'Gx', 4:'Gy', 5:'Gz'}
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
-            
             # # Controlling for target
             # if df_row_0['session'] == session_exclude:
             #     continue
@@ -321,46 +330,58 @@ class DataGenerator:
                     continue
                 
                 if df_row_0["axis"]=="Ax": 
-                    accX = df_row_0[[str(i) for i in range(data_start,data_end)]]
-                    accX_f = filter_remove_noise_and_gravity(accX)
+                    # accX = df_row_0[[str(i) for i in range(data_start,data_end)]]
+                    accX = self.raw_arr[6 * i][data_start:data_end]
+                    # accX_f = filter_remove_noise_and_gravity(accX)
+                    accX_f = accX
                     imu_list.append(accX_f[:data_length])
                     imu_following_list.append(accX_f[data_length:])
         #             imu_normalized_list.append(normalization_minmax(accX_f))
                 df_row_1 = self.df.iloc[i*6+1,:]
                 if df_row_1["axis"]=="Ay": 
-                    accY = df_row_1[[str(i) for i in range(data_start,data_end)]]
-                    accY_f = filter_remove_noise_and_gravity(accY)
+                    # accY = df_row_1[[str(i) for i in range(data_start,data_end)]]
+                    accY = self.raw_arr[6 * i + 1][data_start:data_end]
+                    # accY_f = filter_remove_noise_and_gravity(accY)
+                    accY_f = accY
                     imu_list.append(accY_f[:data_length])
                     imu_following_list.append(accY_f[data_length:])
         #             imu_normalized_list.append(normalization_minmax(accY_f))
                 df_row_2 = self.df.iloc[i*6+2,:]
                 if df_row_2["axis"]=="Az": 
-                    accZ = df_row_2[[str(i) for i in range(data_start,data_end)]]
-                    accZ_f = filter_remove_noise_and_gravity(accZ)
+                    # accZ = df_row_2[[str(i) for i in range(data_start,data_end)]]
+                    accZ = self.raw_arr[6 * i + 2][data_start:data_end]
+                    # accZ_f = filter_remove_noise_and_gravity(accZ)
+                    accZ_f = accZ
                     imu_list.append(accZ_f[:data_length])
                     imu_following_list.append(accZ_f[data_length:])
         #             imu_normalized_list.append(normalization_minmax(accZ_f))
                 df_row_3 = self.df.iloc[i*6+3,:]
                 if df_row_3["axis"]=="Gx":
-                    gyro_deg = df_row_3[[str(i) for i in range(data_start,data_end)]]
+                    # gyro_deg = df_row_3[[str(i) for i in range(data_start,data_end)]]
+                    gyro_deg = self.raw_arr[6 * i + 3][data_start:data_end]
             #         gyro_rad = [math.radians(gyro)/math.pi for gyro in gyro_deg]
-                    gyro_deg_f = filter_remove_noise(gyro_deg)
+                    # gyro_deg_f = filter_remove_noise(gyro_deg)
+                    gyro_deg_f = gyro_deg
                     imu_list.append(gyro_deg_f[:data_length])
                     imu_following_list.append(gyro_deg_f[data_length:])
         #             imu_normalized_list.append(normalization_minmax(gyro_deg_f))
                 df_row_4 = self.df.iloc[i*6+4,:]
                 if df_row_4["axis"]=="Gy": 
-                    gyro_deg = df_row_4[[str(i) for i in range(data_start,data_end)]]
+                    # gyro_deg = df_row_4[[str(i) for i in range(data_start,data_end)]]
+                    gyro_deg = self.raw_arr[6 * i + 4][data_start:data_end]
             #         gyro_rad = [math.radians(gyro)/math.pi for gyro in gyro_deg]
-                    gyro_deg_f = filter_remove_noise(gyro_deg)
+                    # gyro_deg_f = filter_remove_noise(gyro_deg)
+                    gyro_deg_f = gyro_deg
                     imu_list.append(gyro_deg_f[:data_length])
                     imu_following_list.append(gyro_deg_f[data_length:])
         #             imu_normalized_list.append(normalization_minmax(gyro_deg_f))
                 df_row_5 = self.df.iloc[i*6+5,:]
                 if df_row_5["axis"]=="Gz": 
-                    gyro_deg = df_row_5[[str(i) for i in range(data_start,data_end)]]
+                    # gyro_deg = df_row_5[[str(i) for i in range(data_start,data_end)]]
+                    gyro_deg = self.raw_arr[6 * i + 5][data_start:data_end]
             #         gyro_rad = [math.radians(gyro)/math.pi for gyro in gyro_deg]
-                    gyro_deg_f = filter_remove_noise(gyro_deg)
+                    # gyro_deg_f = filter_remove_noise(gyro_deg)
+                    gyro_deg_f = gyro_deg
                     imu_list.append(gyro_deg_f[:data_length])
                     imu_following_list.append(gyro_deg_f[data_length:])
         #             imu_normalized_list.append(normalization_minmax(gyro_deg_f))

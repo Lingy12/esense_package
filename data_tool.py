@@ -235,7 +235,7 @@ class DataGenerator:
         """Initialize data generator with a processed data frame
         
         Args:
-            df (pd.DataFrame): raw data in dataframe format
+            df (pd.DataFrame): raw data in dataframe format. (Sorted)
         """
         self.df = df
         self.imu_instance_list = []

@@ -275,7 +275,10 @@ class DataGenerator:
     user_only: include the user for test.
     pre_touch_only: only extracting pre_touch window or not.
     '''
-    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, pre_touch_only: bool = False):
+    def generate_data(self, data_length:int,step_size:int, 
+                      window_num:int, data_following_length:int,
+                      label_pattern: int = 1, 
+                      pre_touch_only: bool = False):
         """Produce data for different purpose and stored in the object
 
         Args:
@@ -283,8 +286,12 @@ class DataGenerator:
             step_size (int): step size of the generating process
             window_num (int): target number of window
             data_following_length (int): target forcasted signal length for a window
-
+            label_pattern: The way to label the data. 
+            (1: label all window as single activity
+            2: label data as only idol and touching activity for current window
+            3: label data as only idol and touching activity for next window)
         """
+        #TODO: implement different label pattern
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -411,6 +418,9 @@ class DataGenerator:
                     self.window_id_list.append(j)
                     self.time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this              
     
+    def inject_idol_data(self, non_touching_csv: str):
+        #TODO: implement this
+        return 
     '''
     Get the data and target 
     '''            

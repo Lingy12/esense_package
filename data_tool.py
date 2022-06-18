@@ -9,6 +9,7 @@ import numpy as np
 from .filters import filter_remove_noise, normalization_minmax, filter_remove_noise_and_gravity
 import matplotlib as plt
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 mucous_activity_label_list = ['[Mucosal]Rub eyes (L)',
                               '[Mucosal]Rub eyes (R)',
@@ -274,7 +275,8 @@ class DataGenerator:
 
         """
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
-        for i in range(int(len(self.df) / 6)):
+        axis_map = {0:'Ax', 1:'Ay', 2:'Az', 3:'Gx', 4:'Gy', 5:'Gz'}
+        for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
             
             # # Controlling for target
@@ -290,7 +292,7 @@ class DataGenerator:
             # Get touching point
             touch_touching_point = int(df_row_0['touching point'])
             if touch_touching_point>400:
-                print("touching point label error")
+                # print("touching point label error")
                 continue
             
             # Generate windows
@@ -307,10 +309,10 @@ class DataGenerator:
                     data_end = 20 + j * step_size + data_length
                     
                 if data_start < 20:
-                    print("start data point out of boundry!", i, j)
+                    # print("start data point out of boundry!", i, j)
                     continue
                 if data_end > 400:
-                    print("end data point out of boundry!", i, j)
+                    # print("end data point out of boundry!", i, j)
                     continue
                 
                 # Ensure the overlapping of touching point

@@ -275,7 +275,10 @@ class DataGenerator:
     user_only: include the user for test.
     pre_touch_only: only extracting pre_touch window or not.
     '''
-    def generate_data(self, data_length:int,step_size:int, window_num:int, data_following_length:int, pre_touch_only: bool = False):
+    def generate_data(self, data_length:int,step_size:int, 
+                      window_num:int, data_following_length:int,
+                      label_pattern: int = 1, 
+                      pre_touch_only: bool = False):
         """Produce data for different purpose and stored in the object
 
         Args:
@@ -283,8 +286,15 @@ class DataGenerator:
             step_size (int): step size of the generating process
             window_num (int): target number of window
             data_following_length (int): target forcasted signal length for a window
-
+            label_pattern: The way to label the data. 
+            (1: label all window as single activity
+            2: label data as only idle and touching activity for current window (binary)
+            3: label data as only idle and touching activity for next window (binary)
+            4:label data as only idle and touching activity for current window (8 classes)
+            5: label data as only idle and touching activity for current window (8 classes)
+            ...: More to go)
         """
+        #TODO: implement different label pattern
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -400,9 +410,18 @@ class DataGenerator:
 
                     self.imu_instance_list.append(np.array(imu_list).T.tolist())
         #             imu_instance_normalized_list.append(np.array(imu_normalized_list).T.tolist())
-                    self.label_mucous_list.append([get_activity_mucous_code(df_row_0['activity'])])
-                    self.label_list.append([get_activity_code_arranged(df_row_0['activity'])])
+                    if label_pattern == 1:
+                        self.label_mucous_list.append([get_activity_mucous_code(df_row_0['activity'])])
+                        self.label_list.append([get_activity_code_arranged(df_row_0['activity'])])
+                    else:
+                        self.label_list.append([self.__generate_label(touch_touching_point, 
+                                                                data_start, 
+                                                                data_start + data_length, 
+                                                                label_pattern, 
+                                                                df_row_0['activity'])])
                 
+                        
+                    
                     self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
 
                     self.user_list.append(df_row_0['userid'])
@@ -411,6 +430,9 @@ class DataGenerator:
                     self.window_id_list.append(j)
                     self.time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this              
     
+    def inject_idle_data(self, non_touching_csv: str):
+        #TODO: implement this
+        return 
     '''
     Get the data and target 
     '''            
@@ -455,3 +477,29 @@ class DataGenerator:
         self.window_id_list = []
         self.imu_instance_following_list = []
         self.time_to_touch_list = []
+    
+    # In labelling 0 always represent idle
+    def __generate_label(self, touch_point:int, start_idx:int, end_idx:int, label_pattern:int, activity_name:str):
+        if label_pattern == 1:
+            return # Do nonthing because generation will handle with default pipeline
+        elif label_pattern == 2:
+            if end_idx > touch_point:
+                return 0 # idle
+            else:
+                return 1
+        elif label_pattern == 3:
+            if end_idx + (end_idx - start_idx) > touch_point:
+                return 0
+            else:
+                return 1
+        elif label_pattern == 4:
+            if end_idx > touch_point:
+                return 0 # idle
+            else:
+                return get_activity_code_arranged(activity_name) + 1
+        elif label_pattern == 5:
+            if end_idx + (end_idx - start_idx) > touch_point:
+                return 0
+            else:
+                return get_activity_code_arranged(activity_name) + 1
+        

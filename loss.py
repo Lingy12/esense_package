@@ -13,10 +13,10 @@ def activity_musocal_loss(hp_mucosal):
         index_pred = softargmax(y_pred)
         y_mucosal_true = tf.math.multiply(y_true, mucosal_activities_mask)
         y_mucosal_pred = tf.math.multiply(y_pred, mucosal_activities_mask)
-#         tf.print(y_true.shape)
-#         tf.print(y_mucosal_true.shape)
-#         tf.print(mucosal_activities_mask.shape)
-#         tf.print(y_true.shape[0])
+        #         tf.print(y_true.shape)
+        #         tf.print(y_mucosal_true.shape)
+        #         tf.print(mucosal_activities_mask.shape)
+        #         tf.print(y_true.shape[0])
         
 
         non_mucosal_activities_mask = tf.constant([0.,0.,0.,0.,0.,1.,1.,1.,1.]) # same length as one-hot y_pred
@@ -46,12 +46,12 @@ def activity_musocal_loss2(hp_mucosal):
         # assume that top-k elements in the vector are mucosal, and remainder are non-mucosal
         mucosal_activities_mask = tf.constant([1.,1.,1.,1.,1.,0.,0.,0.,0.]) # same length as one-hot y_pred
         index_pred = softargmax(y_pred)
-#         y_mucosal_true = tf.math.multiply(y_true, mucosal_activities_mask)
+        #         y_mucosal_true = tf.math.multiply(y_true, mucosal_activities_mask)
         y_mucosal_pred = tf.math.multiply(y_pred, mucosal_activities_mask)
         mucosal_activities_mask_expanded = tf.math.multiply(all_one, mucosal_activities_mask/5.0)
         
         non_mucosal_activities_mask = tf.constant([0.,0.,0.,0.,0.,1.,1.,1.,1.]) # same length as one-hot y_pred
-#         y_non_mucosal_true = tf.math.multiply(y_true, non_mucosal_activities_mask)
+        #         y_non_mucosal_true = tf.math.multiply(y_true, non_mucosal_activities_mask)
         y_non_mucosal_pred = tf.math.multiply(y_pred, non_mucosal_activities_mask)
         non_mucosal_activities_mask_expanded = tf.math.multiply(all_one, non_mucosal_activities_mask/4.0)
 

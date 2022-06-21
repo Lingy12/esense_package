@@ -129,7 +129,7 @@ class Model:
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.logging_path,
                                                  save_weights_only=True,
                                                  monitor = criteria,
-                                                 verbose=1, save_best_only=True)
+                                                 verbose=kwargs['verbose'], save_best_only=True)
             if kwargs.__contains__('callback'):
                 kwargs['callbacks'].append(cp_callback)
             else:

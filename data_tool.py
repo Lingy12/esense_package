@@ -483,22 +483,22 @@ class DataGenerator:
         if label_pattern == 1:
             return # Do nonthing because generation will handle with default pipeline
         elif label_pattern == 2:
-            if end_idx > touch_point:
+            if end_idx < touch_point:
                 return 0 # idle
             else:
                 return 1
         elif label_pattern == 3:
-            if end_idx + (end_idx - start_idx) > touch_point:
+            if end_idx + (end_idx - start_idx) < touch_point:
                 return 0
             else:
                 return 1
         elif label_pattern == 4:
-            if end_idx > touch_point:
+            if end_idx < touch_point:
                 return 0 # idle
             else:
                 return get_activity_code_arranged(activity_name) + 1
         elif label_pattern == 5:
-            if end_idx + (end_idx - start_idx) > touch_point:
+            if end_idx + (end_idx - start_idx) < touch_point:
                 return 0
             else:
                 return get_activity_code_arranged(activity_name) + 1

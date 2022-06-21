@@ -335,7 +335,7 @@ class DataGenerator:
                     continue
                 
                 # Ensure the overlapping of touching point
-                if data_start < touch_touching_point - data_length or data_end < touch_touching_point:
+                if label_pattern == 1 or (data_start < touch_touching_point - data_length or data_end < touch_touching_point):
                     # print('Skipping non-overlapping')
                     continue
                 
@@ -483,12 +483,12 @@ class DataGenerator:
         if label_pattern == 1:
             return # Do nonthing because generation will handle with default pipeline
         elif label_pattern == 2:
-            if end_idx < touch_point:
+            if end_idx <= touch_point:
                 return 0 # idle
             else:
                 return 1
         elif label_pattern == 3:
-            if end_idx + (end_idx - start_idx) < touch_point:
+            if end_idx + (end_idx - start_idx) <= touch_point:
                 return 0
             else:
                 return 1
@@ -498,7 +498,7 @@ class DataGenerator:
             else:
                 return get_activity_code_arranged(activity_name) + 1
         elif label_pattern == 5:
-            if end_idx + (end_idx - start_idx) < touch_point:
+            if end_idx + (end_idx - start_idx) <= touch_point:
                 return 0
             else:
                 return get_activity_code_arranged(activity_name) + 1

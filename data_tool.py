@@ -231,12 +231,14 @@ class Dataset:
 class DataGenerator:
     """Generate data for training purpose.
     """
-    def __init__(self, df:pd.DataFrame, touching_label_threshold=30, pre_touching_label_threshold=30):
+    def __init__(self, df:pd.DataFrame, touching_label_threshold=30, pre_touching_label_threshold=30, skip_length=20):
         """Initialize data generator with a processed data frame
         
         Args:
             df (pd.DataFrame): raw data in dataframe format. (Sorted)
             touching_label_threshold: threshold for label the activity as touch
+            pre_touching_label_threshold: threshold for label pre-touching
+            skip_length: Skip first few data point to make balance dataset
         """
         self.df = df
         self.imu_instance_list = []
@@ -251,6 +253,7 @@ class DataGenerator:
         self.time_to_touch_list = []
         self.touching_label_threshold = touching_label_threshold
         self.pre_touching_label_threshold = pre_touching_label_threshold
+        self.skip_length = skip_length
         
         # Filter the dataframe
         self.raw_arr = self.df[[str(i) for i in range(400)]].to_numpy()
@@ -327,8 +330,8 @@ class DataGenerator:
                     data_start = touch_touching_point - j * step_size - data_length
                     data_end = touch_touching_point - j * step_size + data_following_length
                 else:
-                    data_start = 20 + j * step_size
-                    data_end = 20 + j * step_size + data_length
+                    data_start = self.skip_length + j * step_size
+                    data_end = self.skip_length + j * step_size + data_length
                     
                 if data_start < 20:
                     # print("start data point out of boundry!", i, j)

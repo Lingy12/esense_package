@@ -514,7 +514,7 @@ class DataGenerator:
                 # 150 because the data starts 1.5s before touch
                 return 0 # idle
             elif end_idx <= touch_point + self.touching_label_threshold:
-                return get_activity_code_arranged(activity_name) + 1 + 8 # Pre-touching
+                return get_activity_code_arranged(activity_name) + 1 + 9 # Pre-touching
             else:
                 return get_activity_code_arranged(activity_name) + 1 # Touching
         elif label_pattern == 6:

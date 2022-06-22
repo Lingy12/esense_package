@@ -297,6 +297,8 @@ class DataGenerator:
             2: label data as only idle and touching activity for current window (binary)
             3: label data as only idle and touching activity for next window (binary)
             4: label data as only idle and touching activity and pre-touching (3 classes)
+            5: label data as detailed class with each classes pre-touching label (17 classes)
+            6: label data as mucosal/non-mucosal with pre-touching label (5 classes)
             ...: More to go)
         """
         #TODO: implement different label pattern

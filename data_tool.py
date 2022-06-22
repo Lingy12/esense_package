@@ -528,6 +528,6 @@ class DataGenerator:
                     return 4
             else:
                 if get_activity_code_arranged(activity_name) < 5:
-                    return 1 # Mucosal pre
+                    return 1 # Mucosal
                 else:
                     return 2

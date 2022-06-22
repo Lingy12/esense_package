@@ -188,7 +188,15 @@ class ClassificationModel(tf.keras.Model):
                                         deploy_regularization:bool=False, regularize_ratio = 0):
         super().__init__()
         self.layer = Conv1DBlock(filters_num, kernel_size, input_shape, output_size, 
-                                 feature_num, dropout_rate, pool_size, regularize_ratio)
+                                 feature_num, dropout_rate, pool_size, regularize_ratio, 'ConvLayer')
+    
+    def call(self, inputs):
+        return self.layer(inputs)
+    
+class UNetModel(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.layer = Unet()
     
     def call(self, inputs):
         return self.layer(inputs)

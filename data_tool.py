@@ -231,7 +231,7 @@ class Dataset:
 class DataGenerator:
     """Generate data for training purpose.
     """
-    def __init__(self, df:pd.DataFrame, touching_label_threshold, pre_touching_label_threshold):
+    def __init__(self, df:pd.DataFrame, touching_label_threshold=30, pre_touching_label_threshold=30):
         """Initialize data generator with a processed data frame
         
         Args:

@@ -13,24 +13,7 @@ from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import MaxPooling1D
 from tensorflow.keras.layers import BatchNormalization, Activation, Conv1DTranspose,concatenate, add
 from tensorflow.keras.regularizers import L1, L2, L1L2
-
-def conv1d_block(input_tensor, n_filters, kernel_size = 3, batchnorm = True):
-    """Function to add 2 convolutional layers with the parameters passed to it"""
-    # first layer
-    x = Conv1D(filters = n_filters, kernel_size = kernel_size,\
-            kernel_initializer = 'he_normal', padding = 'same')(input_tensor)
-    if batchnorm:
-        x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    
-    # second layer
-    x = Conv1D(filters = n_filters, kernel_size = kernel_size,\
-            kernel_initializer = 'he_normal', padding = 'same')(x)
-    if batchnorm:
-        x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    
-    return x
+from .modules import Conv1DBlock, UNet
 
 class Model:
     """Represent a model for training
@@ -198,3 +181,14 @@ class Model:
         model.add(Dense(feature_num, activation='relu', kernel_regularizer=L2(regularize_ratio)))
         model.add(Dense(output_size, activation='softmax', kernel_regularizer=L2(regularize_ratio)))
         self.model = model
+        
+class ClassificationModel(tf.keras.Model):
+    def __init__(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
+                                        feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, 
+                                        deploy_regularization:bool=False, regularize_ratio = 0):
+        super().__init__()
+        self.layer = Conv1DBlock(filters_num, kernel_size, input_shape, output_size, 
+                                 feature_num, dropout_rate, pool_size, regularize_ratio)
+    
+    def call(self, inputs):
+        return self.layer(inputs)

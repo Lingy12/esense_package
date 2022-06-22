@@ -508,3 +508,26 @@ class DataGenerator:
                 return 1 # Pre-touching
             else:
                 return 2 # Touching
+        elif label_pattern == 5:
+            # +1 skip idle
+            if end_idx <= 150 + self.pre_touching_label_threshold:
+                # 150 because the data starts 1.5s before touch
+                return 0 # idle
+            elif end_idx <= touch_point + self.touching_label_threshold:
+                return get_activity_code_arranged(activity_name) + 1 + 8 # Pre-touching
+            else:
+                return get_activity_code_arranged(activity_name) + 1 # Touching
+        elif label_pattern == 6:
+            if end_idx <= 150 + self.pre_touching_label_threshold:
+                # 150 because the data starts 1.5s before touch
+                return 0 # idle
+            elif end_idx <= touch_point + self.touching_label_threshold:
+                if get_activity_code_arranged(activity_name) < 5:
+                    return 3 # Mucosal pre
+                else:
+                    return 4
+            else:
+                if get_activity_code_arranged(activity_name) < 5:
+                    return 1 # Mucosal pre
+                else:
+                    return 2

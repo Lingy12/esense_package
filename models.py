@@ -32,6 +32,14 @@ def conv1d_block(input_tensor, n_filters, kernel_size = 3, batchnorm = True):
     
     return x
 
+class FullNet(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        return
+    def call(self, inputs):
+        return
+    
+
 class Model:
     """Represent a model for training
     """

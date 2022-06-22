@@ -231,11 +231,12 @@ class Dataset:
 class DataGenerator:
     """Generate data for training purpose.
     """
-    def __init__(self, df:pd.DataFrame):
+    def __init__(self, df:pd.DataFrame, touching_label_threshold, pre_touching_label_threshold):
         """Initialize data generator with a processed data frame
         
         Args:
             df (pd.DataFrame): raw data in dataframe format. (Sorted)
+            touching_label_threshold: threshold for label the activity as touch
         """
         self.df = df
         self.imu_instance_list = []
@@ -248,6 +249,8 @@ class DataGenerator:
         self.window_id_list = []
         self.imu_instance_following_list = []
         self.time_to_touch_list = []
+        self.touching_label_threshold = touching_label_threshold
+        self.pre_touching_label_threshold = pre_touching_label_threshold
         
         # Filter the dataframe
         self.raw_arr = self.df[[str(i) for i in range(400)]].to_numpy()
@@ -290,11 +293,11 @@ class DataGenerator:
             (1: label all window as single activity
             2: label data as only idle and touching activity for current window (binary)
             3: label data as only idle and touching activity for next window (binary)
-            4:label data as only idle and touching activity for current window (8 classes)
-            5: label data as only idle and touching activity for current window (8 classes)
+            4: label data as only idle and touching activity and pre-touching (3 classes)
             ...: More to go)
         """
         #TODO: implement different label pattern
+        assert label_pattern >= 1 and label_pattern <= 4
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -483,23 +486,20 @@ class DataGenerator:
         if label_pattern == 1:
             return # Do nonthing because generation will handle with default pipeline
         elif label_pattern == 2:
-            if end_idx <= touch_point:
+            if end_idx <= touch_point + self.touching_label_threshold:
                 return 0 # idle
             else:
                 return 1
         elif label_pattern == 3:
-            if end_idx + (end_idx - start_idx) <= touch_point:
+            if end_idx + (end_idx - start_idx) <= touch_point + self.touching_label_threshold:
                 return 0
             else:
                 return 1
         elif label_pattern == 4:
-            if end_idx < touch_point:
+            if end_idx <= 150 + self.pre_touching_label_threshold:
+                # 150 because the data starts 1.5s before touch
                 return 0 # idle
+            elif end_idx <= touch_point + self.touching_label_threshold:
+                return 1 # Pre-touching
             else:
-                return get_activity_code_arranged(activity_name) + 1
-        elif label_pattern == 5:
-            if end_idx + (end_idx - start_idx) <= touch_point:
-                return 0
-            else:
-                return get_activity_code_arranged(activity_name) + 1
-        
+                return 2 # Touching

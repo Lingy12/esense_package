@@ -297,10 +297,12 @@ class DataGenerator:
             2: label data as only idle and touching activity for current window (binary)
             3: label data as only idle and touching activity for next window (binary)
             4: label data as only idle and touching activity and pre-touching (3 classes)
+            5: label data as detailed class with each classes pre-touching label (17 classes)
+            6: label data as mucosal/non-mucosal with pre-touching label (5 classes)
             ...: More to go)
         """
         #TODO: implement different label pattern
-        assert label_pattern >= 1 and label_pattern <= 4
+        assert label_pattern >= 1 and label_pattern <= 6
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -506,3 +508,26 @@ class DataGenerator:
                 return 1 # Pre-touching
             else:
                 return 2 # Touching
+        elif label_pattern == 5:
+            # +1 skip idle
+            if end_idx <= 150 + self.pre_touching_label_threshold:
+                # 150 because the data starts 1.5s before touch
+                return 0 # idle
+            elif end_idx <= touch_point + self.touching_label_threshold:
+                return get_activity_code_arranged(activity_name) + 1 + 9 # Pre-touching
+            else:
+                return get_activity_code_arranged(activity_name) + 1 # Touching
+        elif label_pattern == 6:
+            if end_idx <= 150 + self.pre_touching_label_threshold:
+                # 150 because the data starts 1.5s before touch
+                return 0 # idle
+            elif end_idx <= touch_point + self.touching_label_threshold:
+                if get_activity_code_arranged(activity_name) < 5:
+                    return 3 # Mucosal pre
+                else:
+                    return 4
+            else:
+                if get_activity_code_arranged(activity_name) < 5:
+                    return 1 # Mucosal
+                else:
+                    return 2

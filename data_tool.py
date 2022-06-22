@@ -302,7 +302,7 @@ class DataGenerator:
             ...: More to go)
         """
         #TODO: implement different label pattern
-        assert label_pattern >= 1 and label_pattern <= 4
+        assert label_pattern >= 1 and label_pattern <= 6
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]

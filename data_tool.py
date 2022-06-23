@@ -443,8 +443,27 @@ class DataGenerator:
                       window_num:int, data_following_length:int,
                       label_pattern: int = 1, 
                       pre_touch_only: bool = False, num_workers = 1):
+        slices = self.__slicing_df__(self.df, num_workers)
+        pool = multiprocessing.Pool(num_workers)
+        jobs = []
         
-        return
+        for pair in slices:
+            jobs.append(pool.apply_async(__process_df__, 
+                                         (pair, ), 
+                                         dict(data_length = data_length, step_size=step_size, window_num=window_num, 
+                                              data_following_length=data_following_length, label_pattern=label_pattern, pre_touch_only=pre_touch_only)))
+        
+        results = [job.get() for job in jobs]
+        
+        # Join all result
+        for res in results:
+            self.label_list += res[0]
+            self.imu_instance_following_list += res[1]
+            self.user_list += res[2]
+            self.session_list += res[3]
+            self.session_instance_list += res[4]
+            self.window_id_list += res[5]
+            self.time_to_touch_list += res[6]
     
     def inject_idle_data(self, non_touching_csv: str):
         #TODO: implement this
@@ -540,10 +559,10 @@ class DataGenerator:
                 else:
                     return 2
 
-    def __process_df__(self, start, end, data_length:int,step_size:int, 
+    def __process_df__(self, slice_pair, data_length:int,step_size:int, 
                       window_num:int, data_following_length:int,
-                      label_pattern: int = 1, 
-                      pre_touch_only: bool = False):
+                      label_pattern: int, 
+                      pre_touch_only: bool):
         imu_instance_list = []
         imu_instance_normalized_list = []
         label_list = []
@@ -554,8 +573,8 @@ class DataGenerator:
         window_id_list = []
         imu_instance_following_list = []
         time_to_touch_list = []
-        df = self.df.iloc[start:end + 1]
-        raw_arr = self.raw_arr[start:end + 1]
+        df = self.df.iloc[slice_pair[0]:slice_pair[1]]
+        raw_arr = self.raw_arr[slice_pair[0]:slice_pair[1]]
         for i in tqdm(range(int(len(df) / 6))):
             df_row_0 = df.iloc[i * 6, :]
             # # Controlling for target
@@ -690,4 +709,17 @@ class DataGenerator:
                     window_id_list.append(j)
                     time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this
                     
-                    return label_list, imu_instance_following_list, session_list, session_instance_list, window_id_list, time_to_touch_list
+                    return label_list, imu_instance_following_list, user_list, session_list, session_instance_list, window_id_list, time_to_touch_list
+    
+    def __slicing_df__(self, df, num_workers):
+        slicing_list = []
+        length = len(df)
+        slicing_length = int(length / num_workers)
+        
+        for i in range(num_workers):
+            if i == num_workers - 1:
+                slicing_list.append((slicing_length * i, length - 1))
+            else:
+                slicing_list.append((i * slicing_length, i * slicing_length + slicing_length))
+                
+        return slicing_list

@@ -37,3 +37,7 @@ class TrainHelper:
     
     def evaluate_model(self, x, y):
         return self.model.evaluate(x, y)
+    
+    def get_best_model(self):
+        self.model.load_weights(self.logging_path)
+        return self.model

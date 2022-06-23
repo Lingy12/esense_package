@@ -575,7 +575,7 @@ class DataGenerator:
         time_to_touch_list = []
         df = self.df.iloc[slice_pair[0]:slice_pair[1]]
         raw_arr = self.raw_arr[slice_pair[0]:slice_pair[1]]
-        for i in tqdm(range(int(len(df) / 6))):
+        for i in range(int(len(df) / 6)):
             df_row_0 = df.iloc[i * 6, :]
             # # Controlling for target
             # if df_row_0['session'] == session_exclude:

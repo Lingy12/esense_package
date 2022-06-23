@@ -21,10 +21,11 @@ class TrainHelper:
         """Fit the model.
 
         Args:
-            x (input data): train input.
-            y (_type_): train target.
+            x (array like): train input.
+            y (array like): train target.
             criteria (str, optional): Criteria to save the model. Defaults to 'val_accuracy'.
         """
+        assert len(x) == len(y)
         if self.log == True:
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.logging_path,
                                                  save_weights_only=True,
@@ -35,4 +36,7 @@ class TrainHelper:
             else:
                 kwargs['callbacks'] = [cp_callback]
         
-        return model.fit(x, y, **kwargs)
+        return self.model.fit(x, y, **kwargs)
+    
+    def evaluate_model(self, x, y):
+        return self.model.evaluate(x, y)

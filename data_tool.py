@@ -444,6 +444,7 @@ class DataGenerator:
                       label_pattern: int = 1, 
                       pre_touch_only: bool = False, num_workers = 1):
         slices = self.__slicing_df__(self.df, num_workers)
+        print(slices, len(self.df))
         pool = multiprocessing.Pool(num_workers)
         jobs = []
         
@@ -454,7 +455,7 @@ class DataGenerator:
                                               data_following_length=data_following_length, label_pattern=label_pattern, pre_touch_only=pre_touch_only)))
         
         results = [job.get() for job in jobs]
-        
+        print(len(results))
         # Join all result
         for res in results:
             self.label_list += res[0]
@@ -486,7 +487,7 @@ class DataGenerator:
         Returns:
             tuple: raw series and labels (raw label and mucous label).
         """
-        assert len(self.imu_instance_list) != 0 and len(self.label_list) != 0 and len(self.label_list) != 0
+        assert len(self.imu_instance_list) != 0 and len(self.label_list) != 0
         return self.imu_instance_list, self.label_list, self.label_mucous_list
     
     def get_list_for_time_prediction(self) -> tuple:

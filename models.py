@@ -18,7 +18,7 @@ from .modules import Conv1DBlock, UNet
 class ClassificationModel(tf.keras.Model):
     def __init__(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
                                         feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, 
-                                        deploy_regularization:bool=False, regularize_ratio = 0):
+                                        deploy_regularization:bool=False, regularize_ratio:float = 0):
         super().__init__()
         self.layer = Conv1DBlock(filters_num, kernel_size, input_shape, output_size, 
                                  feature_num, dropout_rate, pool_size, regularize_ratio, 'ConvLayer')

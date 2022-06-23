@@ -1,12 +1,12 @@
-from .models import Model
 import tensorflow as tf
 import os
 
 class TrainHelper:
-    """Train helper helps the to train the given model with different requirements
+    """Train helper helps the to train the given model with different requirements.
     """
     def __init__(self, model:tf.keras.Model, model_name:str, log:bool = False):
         """Initialize the train helper
+        Pass in a compiled model
         """
         self.model_name = model_name
         self.logging_path = f'./my_checkpoint/{model_name}'
@@ -35,8 +35,9 @@ class TrainHelper:
         
         return self.model.fit(x, y, **kwargs)
     
-    def evaluate_model(self, x, y):
-        return self.model.evaluate(x, y)
+    def evaluate_model(self, x, y, **kwargs):
+        self.model.load_weights(self.logging_path)
+        return self.model.evaluate(x, y, **kwargs)
     
     def get_best_model(self):
         self.model.load_weights(self.logging_path)

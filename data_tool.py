@@ -10,6 +10,7 @@ from .filters import filter_remove_noise, normalization_minmax, filter_remove_no
 import matplotlib as plt
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+import multiprocessing
 
 mucous_activity_label_list = ['[Mucosal]Rub eyes (L)',
                               '[Mucosal]Rub eyes (R)',
@@ -437,6 +438,13 @@ class DataGenerator:
                     self.session_instance_list.append(df_row_0['instance'])
                     self.window_id_list.append(j)
                     self.time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this              
+    
+    def generate_data_sync(self, data_length:int,step_size:int, 
+                      window_num:int, data_following_length:int,
+                      label_pattern: int = 1, 
+                      pre_touch_only: bool = False, num_workers = 1):
+        
+        return
     
     def inject_idle_data(self, non_touching_csv: str):
         #TODO: implement this

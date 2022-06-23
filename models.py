@@ -29,7 +29,7 @@ class ClassificationModel(tf.keras.Model):
 class UNetModel(tf.keras.Model):
     def __init__(self):
         super().__init__()
-        self.layer = Unet()
+        self.layer = UNet()
     
     def call(self, inputs):
         return self.layer(inputs)

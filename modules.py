@@ -11,6 +11,18 @@ from tensorflow.keras.regularizers import L1, L2, L1L2
 class Conv1DBlock(tf.Module):
     def __init__(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
                                     feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, regularize_ratio: float = 0, name=None):
+        """Conv1D block for classification
+
+        Args:
+            filters_num (int): Filter number for conv layers.
+            kernel_size (int): Kernel size for conv layers.
+            input_shape (int): Input shape of the data.
+            output_size (int): Output size of model.
+            feature_num (int, optional): Number of features to be extracted. Defaults to 100.
+            dropout_rate (int, optional): Dropout rate for model. Defaults to 0.5.
+            pool_size (int, optional): Pooling size for pooling layers. Defaults to 2.
+            regularize_ratio (float, optional): Lambda value for model. Defaults to 0.
+        """
         super().__init__(name=name)
         with self.name_scope:
             self.layer1 = Conv1D(filters=filters_num, kernel_size=kernel_size, activation='relu', 
@@ -36,6 +48,14 @@ class Conv1DBlock(tf.Module):
 
 class UNetConv1DBlock(tf.Module):
     def __init__(self, n_filters, kernel_size = 3, batchnorm = True, name=None):
+        """Conv block for Unet
+
+        Args:
+            n_filters (_type_): Number of filters.
+            kernel_size (int, optional): Kernel size for conv layers. Defaults to 3.
+            batchnorm (bool, optional): Using batch normlaization or not. Defaults to True.
+            name (_type_, optional): module name. Defaults to None.
+        """
         super().__init__(name=name)
         with self.name_scope:
             self.conv_layer1 = Conv1D(filters = n_filters, kernel_size = kernel_size,\
@@ -64,6 +84,16 @@ class UNetConv1DBlock(tf.Module):
         
 class UNet(tf.Module):
     def __init__(self, output_unit = -1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True, name=None):
+        """Unet module.
+
+        Args:
+            output_unit (int, optional): Unit for output layer. Defaults to -1.
+            for_segamentation (bool, optional):The model is for segmentation or not. Defaults to True.
+            n_filters (int, optional): Number of filters in conv block. Defaults to 16.
+            dropout (float, optional): Dropout rate for model. Defaults to 0.1.
+            batchnorm (bool, optional): Use batch normalization or not. Defaults to True.
+            name (_type_, optional): Module name. Defaults to None.
+        """
         super().__init__(name=name)
         with self.name_scope:
             self.downsample1 = UNetConv1DBlock(n_filters * 1, kernel_size=3, batchnorm=batchnorm)

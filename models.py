@@ -18,7 +18,19 @@ from .modules import Conv1DBlock, UNet
 class ClassificationModel(tf.keras.Model):
     def __init__(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
                                         feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, 
-                                        deploy_regularization:bool=False, regularize_ratio:float = 0):
+                                        regularize_ratio:float = 0):
+        """Model for classification
+
+        Args:
+            filters_num (int): Filter number for conv layers.
+            kernel_size (int): Kernel size for conv layers.
+            input_shape (int): Input shape of the data.
+            output_size (int): Output size of model.
+            feature_num (int, optional): Number of features to be extracted. Defaults to 100.
+            dropout_rate (int, optional): Dropout rate for model. Defaults to 0.5.
+            pool_size (int, optional): Pooling size for pooling layers. Defaults to 2.
+            regularize_ratio (float, optional): Lambda value for model. Defaults to 0.
+        """
         super().__init__()
         self.layer = Conv1DBlock(filters_num, kernel_size, input_shape, output_size, 
                                  feature_num, dropout_rate, pool_size, regularize_ratio, 'ConvLayer')

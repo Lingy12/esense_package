@@ -150,7 +150,4 @@ class UNet(tf.Module):
         
         if not self.for_seg:
             outputs = self.dense(outputs)
-        return outputs
-        
-        
-        
+        return outputs   

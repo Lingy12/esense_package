@@ -444,18 +444,18 @@ class DataGenerator:
                       label_pattern: int = 1, 
                       pre_touch_only: bool = False, num_workers = 1):
         slices = self.__slicing_df__(self.df, num_workers)
-        print(slices, len(self.df))
+        # print(slices, len(self.df))
         pool = multiprocessing.Pool(num_workers)
-        jobs = []
-        
+        results = []
         for pair in slices:
-            jobs.append(pool.apply_async(self.__process_df__, 
+            pool.apply_async(self.__process_df__, 
                                          (pair, ), 
                                          dict(data_length = data_length, step_size=step_size, window_num=window_num, 
-                                              data_following_length=data_following_length, label_pattern=label_pattern, pre_touch_only=pre_touch_only)))
-        
-        results = [job.get() for job in jobs]
-        print(len(results))
+                                              data_following_length=data_following_length, label_pattern=label_pattern, pre_touch_only=pre_touch_only),
+                                         callback=results.append)
+        pool.close()
+        pool.join()
+        # print(len(results))
         # Join all result
         for res in results:
             self.label_list += res[0]
@@ -465,6 +465,7 @@ class DataGenerator:
             self.session_instance_list += res[4]
             self.window_id_list += res[5]
             self.time_to_touch_list += res[6]
+            self.imu_instace_list += res[7]
     
     def inject_idle_data(self, non_touching_csv: str):
         #TODO: implement this
@@ -709,18 +710,17 @@ class DataGenerator:
                     session_instance_list.append(df_row_0['instance'])
                     window_id_list.append(j)
                     time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this
-                    
-                    return label_list, imu_instance_following_list, user_list, session_list, session_instance_list, window_id_list, time_to_touch_list
+                    return label_list, imu_instance_following_list, user_list, session_list, session_instance_list, window_id_list, time_to_touch_list, imu_instace_list
     
     def __slicing_df__(self, df, num_workers):
         slicing_list = []
-        length = len(df)
+        length = len(df) / 6
         slicing_length = int(length / num_workers)
         
         for i in range(num_workers):
             if i == num_workers - 1:
-                slicing_list.append((slicing_length * i, length - 1))
+                slicing_list.append((slicing_length * i * 6, length - 1))
             else:
-                slicing_list.append((i * slicing_length, i * slicing_length + slicing_length))
+                slicing_list.append((i * slicing_length * 6, 6 * i * slicing_length + 6 * slicing_length))
                 
         return slicing_list

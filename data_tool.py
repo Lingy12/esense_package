@@ -448,7 +448,7 @@ class DataGenerator:
         jobs = []
         
         for pair in slices:
-            jobs.append(pool.apply_async(__process_df__, 
+            jobs.append(pool.apply_async(self.__process_df__, 
                                          (pair, ), 
                                          dict(data_length = data_length, step_size=step_size, window_num=window_num, 
                                               data_following_length=data_following_length, label_pattern=label_pattern, pre_touch_only=pre_touch_only)))

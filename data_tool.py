@@ -539,3 +539,155 @@ class DataGenerator:
                     return 1 # Mucosal
                 else:
                     return 2
+
+    def __process_df__(self, start, end, data_length:int,step_size:int, 
+                      window_num:int, data_following_length:int,
+                      label_pattern: int = 1, 
+                      pre_touch_only: bool = False):
+        imu_instance_list = []
+        imu_instance_normalized_list = []
+        label_list = []
+        label_mucous_list = []
+        user_list = []
+        session_list = []
+        session_instance_list = []
+        window_id_list = []
+        imu_instance_following_list = []
+        time_to_touch_list = []
+        df = self.df.iloc[start:end + 1]
+        raw_arr = self.raw_arr[start:end + 1]
+        for i in tqdm(range(int(len(df) / 6))):
+            df_row_0 = df.iloc[i * 6, :]
+            # # Controlling for target
+            # if df_row_0['session'] == session_exclude:
+            #     continue
+            # if df_row_0['source'] not in source_include:
+            #     continue
+            # if df_row_0['userid'] == user_exclude and not for_test :
+            #     continue
+            # if for_test and user_only != df_row_0['userid']:
+            #     continue
+            
+            # Get touching point
+            touch_touching_point = int(df_row_0['touching point'])
+            if touch_touching_point>400:
+                # print("touching point label error")
+                continue
+            
+            # Generate windows
+            for j in range(window_num):
+                imu_list = []
+                imu_normalized_list = []
+                imu_following_list = []
+                
+                if pre_touch_only:
+                    data_start = touch_touching_point - j * step_size - data_length
+                    data_end = touch_touching_point - j * step_size + data_following_length
+                else:
+                    data_start = self.skip_length + j * step_size
+                    data_end = self.skip_length + j * step_size + data_length
+                    
+                if data_start < 20:
+                    # print("start data point out of boundry!", i, j)
+                    continue
+                if data_end > 400:
+                    # print("end data point out of boundry!", i, j)
+                    continue
+                
+                # Ensure the overlapping of touching point
+                if label_pattern == 1 and (data_start < touch_touching_point - data_length or data_end < touch_touching_point):
+                    # print('Skipping non-overlapping')
+                    continue
+                
+                if df_row_0["axis"]=="Ax": 
+                    # accX = df_row_0[[str(i) for i in range(data_start,data_end)]]
+                    accX = raw_arr[6 * i][data_start:data_end]
+                    # accX_f = filter_remove_noise_and_gravity(accX)
+                    accX_f = accX
+                    imu_list.append(accX_f[:data_length])
+                    imu_following_list.append(accX_f[data_length:])
+        #             imu_normalized_list.append(normalization_minmax(accX_f))
+                df_row_1 = df.iloc[i*6+1,:]
+                if df_row_1["axis"]=="Ay": 
+                    # accY = df_row_1[[str(i) for i in range(data_start,data_end)]]
+                    accY = raw_arr[6 * i + 1][data_start:data_end]
+                    # accY_f = filter_remove_noise_and_gravity(accY)
+                    accY_f = accY
+                    imu_list.append(accY_f[:data_length])
+                    imu_following_list.append(accY_f[data_length:])
+        #             imu_normalized_list.append(normalization_minmax(accY_f))
+                df_row_2 = df.iloc[i*6+2,:]
+                if df_row_2["axis"]=="Az": 
+                    # accZ = df_row_2[[str(i) for i in range(data_start,data_end)]]
+                    accZ = raw_arr[6 * i + 2][data_start:data_end]
+                    # accZ_f = filter_remove_noise_and_gravity(accZ)
+                    accZ_f = accZ
+                    imu_list.append(accZ_f[:data_length])
+                    imu_following_list.append(accZ_f[data_length:])
+        #             imu_normalized_list.append(normalization_minmax(accZ_f))
+                df_row_3 = df.iloc[i*6+3,:]
+                if df_row_3["axis"]=="Gx":
+                    # gyro_deg = df_row_3[[str(i) for i in range(data_start,data_end)]]
+                    gyro_deg = raw_arr[6 * i + 3][data_start:data_end]
+            #         gyro_rad = [math.radians(gyro)/math.pi for gyro in gyro_deg]
+                    # gyro_deg_f = filter_remove_noise(gyro_deg)
+                    gyro_deg_f = gyro_deg
+                    imu_list.append(gyro_deg_f[:data_length])
+                    imu_following_list.append(gyro_deg_f[data_length:])
+        #             imu_normalized_list.append(normalization_minmax(gyro_deg_f))
+                df_row_4 = df.iloc[i*6+4,:]
+                if df_row_4["axis"]=="Gy": 
+                    # gyro_deg = df_row_4[[str(i) for i in range(data_start,data_end)]]
+                    gyro_deg = raw_arr[6 * i + 4][data_start:data_end]
+            #         gyro_rad = [math.radians(gyro)/math.pi for gyro in gyro_deg]
+                    # gyro_deg_f = filter_remove_noise(gyro_deg)
+                    gyro_deg_f = gyro_deg
+                    imu_list.append(gyro_deg_f[:data_length])
+                    imu_following_list.append(gyro_deg_f[data_length:])
+        #             imu_normalized_list.append(normalization_minmax(gyro_deg_f))
+                df_row_5 = df.iloc[i*6+5,:]
+                if df_row_5["axis"]=="Gz": 
+                    # gyro_deg = df_row_5[[str(i) for i in range(data_start,data_end)]]
+                    gyro_deg = raw_arr[6 * i + 5][data_start:data_end]
+            #         gyro_rad = [math.radians(gyro)/math.pi for gyro in gyro_deg]
+                    # gyro_deg_f = filter_remove_noise(gyro_deg)
+                    gyro_deg_f = gyro_deg
+                    imu_list.append(gyro_deg_f[:data_length])
+                    imu_following_list.append(gyro_deg_f[data_length:])
+        #             imu_normalized_list.append(normalization_minmax(gyro_deg_f))
+
+                if len(imu_list)!=6:
+                    print(i)
+                else:
+                    add_gravity = False
+                    if add_gravity:
+                        imu_list.append(accX_f) ## add acc data with gravity
+                        imu_list.append(accY_f)
+                        imu_list.append(accZ_f)
+                        imu_normalized_list.append(normalization_minmax(accX_f)) ## add acc data with gravity
+                        imu_normalized_list.append(normalization_minmax(accY_f))
+                        imu_normalized_list.append(normalization_minmax(accZ_f))           
+
+                    imu_instance_list.append(np.array(imu_list).T.tolist())
+        #             imu_instance_normalized_list.append(np.array(imu_normalized_list).T.tolist())
+                    if label_pattern == 1:
+                        label_mucous_list.append([get_activity_mucous_code(df_row_0['activity'])])
+                        label_list.append([get_activity_code_arranged(df_row_0['activity'])])
+                    else:
+                        label_list.append([self.__generate_label(touch_touching_point, 
+                                                                data_start, 
+                                                                data_start + data_length, 
+                                                                label_pattern, 
+                                                                df_row_0['activity'])])
+                
+                        
+                    
+                    imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
+
+                    user_list.append(df_row_0['userid'])
+                    session_list.append(df_row_0['session'])
+                    session_instance_list.append(df_row_0['instance'])
+                    window_id_list.append(j)
+                    time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this
+                    
+                    return label_list, imu_instance_following_list, session_list, session_instance_list, window_id_list, time_to_touch_list

@@ -82,6 +82,6 @@ def train_and_evaludate_classification_model(data, **kwargs):
     _, train_acc = model.evaluate(trainX, trainy, batch_size=batch_size, verbose=0)
     y_pred = model.predict(testX)
 
-    print(f'Training accuracy: {train_acc}')
-    print(f'Testing accuracy: {accuracy}')
+    print(f'Training {criteria}: {train_acc}')
+    print(f'Testing {criteria}: {accuracy}')
     get_confusionmatrix(y_pred, testy, label_list, 'CM')

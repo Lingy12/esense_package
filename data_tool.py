@@ -299,10 +299,11 @@ class DataGenerator:
             4: label data as only idle and touching activity and pre-touching (3 classes)
             5: label data as detailed class with each classes pre-touching label (17 classes)
             6: label data as mucosal/non-mucosal with pre-touching label (5 classes)
+            7: label idle/pre-touching only without touching data
             ...: More to go)
         """
         #TODO: implement different label pattern
-        assert label_pattern >= 1 and label_pattern <= 6
+        assert label_pattern >= 1 and label_pattern <= 7
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -345,6 +346,9 @@ class DataGenerator:
                 # Ensure the overlapping of touching point
                 if label_pattern == 1 and (data_start < touch_touching_point - data_length or data_end < touch_touching_point):
                     # print('Skipping non-overlapping')
+                    continue
+                
+                if label_pattern == 7 and data_start + data_length > touch_touching_point:
                     continue
                 
                 if df_row_0["axis"]=="Ax": 
@@ -531,3 +535,8 @@ class DataGenerator:
                     return 1 # Mucosal
                 else:
                     return 2
+        elif label_pattern == 7:
+            if end_idx <= 150 + self.pre_touching_label_threshold:
+                return 0
+            else:
+                return 1

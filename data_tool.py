@@ -300,10 +300,11 @@ class DataGenerator:
             5: label data as detailed class with each classes pre-touching label (17 classes)
             6: label data as mucosal/non-mucosal with pre-touching label (5 classes)
             7: label idle/pre-touching only without touching data
+            8: label pre-touching as mucosal and non-mucosal only
             ...: More to go)
         """
         #TODO: implement different label pattern
-        assert label_pattern >= 1 and label_pattern <= 7
+        assert label_pattern >= 1 and label_pattern <= 8
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -349,6 +350,9 @@ class DataGenerator:
                     continue
                 
                 if label_pattern == 7 and data_start + data_length > touch_touching_point:
+                    continue
+                
+                if label_pattern == 8 and (data_start + data_length < 150 or data_start + data_length > touch_touching_point): 
                     continue
                 
                 if df_row_0["axis"]=="Ax": 
@@ -540,3 +544,9 @@ class DataGenerator:
                 return 0
             else:
                 return 1
+        elif label_pattern == 8:
+            if get_activity_code_arranged(activity_name) < 5:
+                return 0 # Mucosal pre
+            else:
+                return 1 # non-mucosal pre
+            

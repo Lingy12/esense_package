@@ -575,4 +575,6 @@ class DataGenerator:
                 return 0 # Mucosal pre
             else:
                 return 1 # non-mucosal pre
+        else:
+            return None
             

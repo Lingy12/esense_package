@@ -57,6 +57,48 @@ def create_data_classification(**kwargs):
     
     return trainX, trainy, testX, testy
 
+def create_data_forcasting(**kwargs):
+    touching_label_threshold = kwargs['touching_label_threshold']
+    pre_touching_label_threshold = kwargs['pre_touching_label_threshold']
+    skip_length = kwargs['skip_length']
+    data_length = kwargs['data_length']
+    step_size = kwargs['step_size']
+    window_num = kwargs['window_num']
+    data_following_length = kwargs['data_following_length']
+    label_pattern = kwargs['label_pattern']
+    imu_file_name = kwargs['imu_file_name']
+    label_file_name = kwargs['label_file_name']
+    source = kwargs['source']
+    session = kwargs['session']
+    test_ratio = kwargs['test_ratio']
+    
+    dataset = Dataset(imu_file_name = imu_file_name, label_file_name = label_file_name)
+    dataset.filter_source_session(source=source, session=session)
+    dataset.deploy_train_test_split(test_ratio)
+    train_df = dataset.get_train_df()
+    test_df = dataset.get_test_df()
+    train_dg = DataGenerator(train_df, touching_label_threshold=touching_label_threshold, pre_touching_label_threshold=pre_touching_label_threshold, skip_length=skip_length)
+    test_dg = DataGenerator(test_df, touching_label_threshold=touching_label_threshold, pre_touching_label_threshold=pre_touching_label_threshold, skip_length=skip_length)
+
+    train_dg.reset()
+    test_dg.reset()
+
+    train_dg.generate_data(data_length = data_length, step_size = step_size, window_num = window_num, 
+                            data_following_length = data_following_length, label_pattern=label_pattern)
+    test_dg.generate_data(data_length = data_length, step_size = step_size, window_num = window_num, 
+                            data_following_length = data_following_length, label_pattern=label_pattern)
+
+    trainX, trainy = train_dg.get_list_for_forcasting()
+    testX, testy = test_dg.get_list_for_forcasting()
+
+    testX, testy = np.array(testX), to_categorical(np.array(testy))
+    trainX, trainy= np.array(trainX), to_categorical(np.array(trainy))
+
+    print(f'Training instance: {len(trainX)}')
+    print(f'Test instance: {len(testX)}')
+    
+    return trainX, trainy, testX, testy
+
 def train_and_evaludate_classification_model(data, **kwargs):
     trainX, trainy, testX, testy = data
     verbose, epochs, batch_size = kwargs['verbose'], kwargs['epochs'], kwargs['batch_size']

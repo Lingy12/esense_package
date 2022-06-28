@@ -359,6 +359,9 @@ class DataGenerator:
                 if label_pattern == 8 and (data_start + data_length < 150 or data_start + data_length > touch_touching_point): 
                     continue
                 
+                if label_pattern == 9 and data_start > touch_touching_point:
+                    continue # Make sure the head containing pre-touching data
+                
                 if df_row_0["axis"]=="Ax": 
                     # accX = df_row_0[[str(i) for i in range(data_start,data_end)]]
                     accX = self.raw_arr[6 * i][data_start:data_end]

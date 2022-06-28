@@ -9,6 +9,7 @@ from sklearn.metrics import classification_report
 import numpy as np
 import matplotlib.pyplot as plt 
 import numpy as np
+import random
 
 
 def get_confusionmatrix(y_pred:np.array, y_true:np.array, classes_list:list, title:str, 
@@ -75,20 +76,38 @@ def get_classification_report(y_pred: np.array, y_true: np.array):
         str or dict: report representation.
     """
     return classification_report(y_pred, y_true)
+
+def plot_instance(seen_series, actual_next, pred_next, axis, color_map):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15,5))
+    true_signal = np.concatenate([seen_series, actual_next]).T
+    pred_signal = np.concatenate([seen_series, pred_next]).T
+
+    for i in range(len(axis)):
+        if i < 3:
+            ax1.plot(true_signal[i], f'{color_map[i]}-', label=f'[{axis[i]}]true')
+            ax1.plot(pred_signal[i], f'{color_map[i]}--', label=f'[{axis[i]}]pred')
+            ax1.set_title('Acc')
+        else:
+            ax2.plot(true_signal[i], f'{color_map[i - 3]}-', label=f'[{axis[i]}]true')
+            ax2.plot(pred_signal[i], f'{color_map[i - 3]}--', label=f'[{axis[i]}]pred')
+            ax2.set_title('Gyro')
+    ax1.legend(loc ="lower left");
+    ax2.legend(loc="lower left")
+    plt.legend()
+    plt.show()
     
-def visualize_reconstruction(trainX:np.array, y_pred: np.array, target:np.array):
+def visualize_reconstruction(model, testX:np.array, y_pred: np.array, testy:np.array):
     """Visualize the reconstructed signal.
 
     Args:
-        trainX (np.array): training input data.
+        testX (np.array): training input data.
         y_pred (np.array): reconstruced data.
-        target (np.array): true signal.
+        testy (np.array): true signal.
     """
-    for j in range(50):
-        data_id = j
-        index_pred = [i for i in range(len(trainX[data_id]),len(trainX[data_id])+len(y_pred[data_id]))]
-        plt.plot(trainX[data_id,:,3],'-.b',label="input data (x_pre-touching)")
-        plt.plot(index_pred,target[data_id],'-.g',label="following data (x_touching)")
-        plt.plot(index_pred,y_pred[data_id],'-.r',label="predicted data (x_prediction)")
-        plt.legend()
-        plt.show()
+    axis = ['Ax', 'Ay', 'Az', 'Gx', 'Gy', 'Gz']
+    color_map = ['r', 'g', 'b']
+    indices = random.choices(list(range(len(testX))), k = 10)
+    y_pred = model.predict(testX)
+
+    for idx in indices:
+        plot_instance(testX[idx], testy[idx], y_pred[idx], axis, color_map)

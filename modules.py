@@ -83,7 +83,7 @@ class UNetConv1DBlock(tf.Module):
         return x
         
 class UNet(tf.Module):
-    def __init__(self, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True, name=None):
+    def __init__(self, out_unit=-1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True, name=None):
         """Unet module.
 
         Args:
@@ -126,9 +126,9 @@ class UNet(tf.Module):
             self.drop7 = Dropout(dropout)
             self.downsample8 = UNetConv1DBlock(n_filters * 2, kernel_size = 3, batchnorm = batchnorm)
             
-            self.upsampling4 = Conv1DTranspose(n_filters * 2, 3, strides = 2, padding = 'same')
+            self.upsampling4 = Conv1DTranspose(n_filters * 1, 3, strides = 2, padding = 'same')
             self.drop8 = Dropout(dropout)
-            self.downsample9 = UNetConv1DBlock(n_filters * 2, kernel_size = 3, batchnorm = batchnorm)
+            self.downsample9 = UNetConv1DBlock(n_filters * 1, kernel_size = 3, batchnorm = batchnorm)
             
             self.out_layer = Conv1D(1, 1, activation='sigmoid')
             
@@ -171,10 +171,10 @@ class UNet(tf.Module):
         u8 = self.drop7(u8)
         c8 = self.downsample8(u8)
         
-        u9 = self.upsampling4(c7)
+        u9 = self.upsampling4(c8)
         u9 = concatenate([u9, c1])
-        u9 = self.drop8(u8)
-        c9 = self.downsample9(u8)
+        u9 = self.drop8(u9)
+        c9 = self.downsample9(u9)
         
         if self.for_seg:
             outputs = self.out_layer(c9)

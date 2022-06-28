@@ -456,7 +456,7 @@ class DataGenerator:
                         
                         # Only forcast pre-touching window
                         if p < 0:
-                            self.imu_instance_following_list.append(np.array(imu_following_list).T.toList())
+                            self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
                         elif p > 0:
                             if touch_leaving_point >= touch_touching_point + p: ## when leaving point is out of the window
                                 for q in range(p): 

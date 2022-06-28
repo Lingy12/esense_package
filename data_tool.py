@@ -339,7 +339,7 @@ class DataGenerator:
                     data_end = touch_touching_point - j * step_size + data_following_length
                 else:
                     data_start = self.skip_length + j * step_size
-                    data_end = self.skip_length + j * step_size + data_length
+                    data_end = self.skip_length + j * step_size + data_length + data_following_length
                     
                 if data_start < 20:
                     # print("start data point out of boundry!", i, j)
@@ -431,7 +431,7 @@ class DataGenerator:
                         imu_normalized_list.append(normalization_minmax(accY_f))
                         imu_normalized_list.append(normalization_minmax(accZ_f))           
 
-                    self.imu_instance_list.append(np.array(imu_list).T.tolist())
+                    
         #             imu_instance_normalized_list.append(np.array(imu_normalized_list).T.tolist())
                     if label_pattern == 1:
                         self.label_mucous_list.append([get_activity_mucous_code(df_row_0['activity'])])
@@ -456,18 +456,20 @@ class DataGenerator:
                     if label_pattern == 9:
                         label_touching_unet = [0 for i in range(data_length)]
                         p = data_end - touch_touching_point
-                        
+                        # print(imu_following_list, data_following_length, data_end)
                         # Only forcast pre-touching window
                         if p < 0:
                             self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
                         elif p > 0:
-                            if touch_leaving_point >= touch_touching_point + p: ## when leaving point is out of the window
-                                for q in range(p): 
-                                    label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
-                            else:
-                                for q in range(touch_leaving_point-touch_touching_point): 
-                                    label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
-                        self.label_touching_unet_list.append(label_touching_unet)
+                            continue
+                        #     if touch_leaving_point >= touch_touching_point + p: ## when leaving point is out of the window
+                        #         for q in range(p): 
+                        #             label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
+                        #     else:
+                        #         for q in range(touch_leaving_point-touch_touching_point): 
+                        #             label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
+                        # self.label_touching_unet_list.append(label_touching_unet)
+                    self.imu_instance_list.append(np.array(imu_list).T.tolist())
                     
                     
     def inject_idle_data(self, non_touching_csv: str):

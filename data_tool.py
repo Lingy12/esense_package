@@ -464,7 +464,7 @@ class DataGenerator:
                             else:
                                 for q in range(touch_leaving_point-touch_touching_point): 
                                     label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
-                        self.label_touching_unet.append(label_touching_unet)
+                        self.label_touching_unet_list.append(label_touching_unet)
                     
                     
     def inject_idle_data(self, non_touching_csv: str):

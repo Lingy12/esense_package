@@ -91,8 +91,8 @@ def create_data_forcasting(**kwargs):
     trainX, trainy = train_dg.get_list_for_forcasting()
     testX, testy = test_dg.get_list_for_forcasting()
 
-    testX, testy = np.array(testX), to_categorical(np.array(testy))
-    trainX, trainy= np.array(trainX), to_categorical(np.array(trainy))
+    testX, testy = np.array(testX), np.array(testy)
+    trainX, trainy= np.array(trainX), np.array(trainy)
 
     print(f'Training instance: {len(trainX)}')
     print(f'Test instance: {len(testX)}')

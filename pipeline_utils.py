@@ -128,7 +128,7 @@ def train_and_evaludate_classification_model(data, **kwargs):
     print(f'Testing {criteria}: {accuracy}')
     get_confusionmatrix(y_pred, testy, label_list, 'CM')
     
-def train_and_evaludate_forcasting_model(data, **kwargs):
+def train_forcasting_model(data, **kwargs):
     trainX, trainy, testX, testy = data
     verbose, epochs, batch_size = kwargs['verbose'], kwargs['epochs'], kwargs['batch_size']
     model_name = kwargs['model_name']
@@ -154,3 +154,4 @@ def train_and_evaludate_forcasting_model(data, **kwargs):
 
     print(f'Training {criteria}: {train_loss}')
     print(f'Testing {criteria}: {test_loss}')
+    return model

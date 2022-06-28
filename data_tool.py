@@ -251,6 +251,7 @@ class DataGenerator:
         self.window_id_list = []
         self.imu_instance_following_list = []
         self.time_to_touch_list = []
+        self.label_touching_unet_list = []
         self.touching_label_threshold = touching_label_threshold
         self.pre_touching_label_threshold = pre_touching_label_threshold
         self.skip_length = skip_length
@@ -301,10 +302,11 @@ class DataGenerator:
             6: label data as mucosal/non-mucosal with pre-touching label (5 classes)
             7: label idle/pre-touching only without touching data
             8: label pre-touching as mucosal and non-mucosal only
+            9: For segmentation
             ...: More to go)
         """
         #TODO: implement different label pattern
-        assert label_pattern >= 1 and label_pattern <= 8
+        assert label_pattern >= 1 and label_pattern <= 9
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -320,6 +322,8 @@ class DataGenerator:
             
             # Get touching point
             touch_touching_point = int(df_row_0['touching point'])
+            touch_leaving_point = int(df_row_0['leaving point'])
+            
             if touch_touching_point>400:
                 # print("touching point label error")
                 continue
@@ -438,14 +442,31 @@ class DataGenerator:
                 
                         
                     
-                    self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
+                    # self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
 
                     self.user_list.append(df_row_0['userid'])
                     self.session_list.append(df_row_0['session'])
                     self.session_instance_list.append(df_row_0['instance'])
                     self.window_id_list.append(j)
                     self.time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this              
-    
+                    
+                    if label_pattern == 9:
+                        label_touching_unet = [0 for i in range(data_length)]
+                        p = data_end - touch_touching_point
+                        
+                        # Only forcast pre-touching window
+                        if p < 0:
+                            self.imu_instance_following_list.append(np.array(imu_following_list).T.toList())
+                        elif p > 0:
+                            if touch_leaving_point >= touch_touching_point + p: ## when leaving point is out of the window
+                                for q in range(p): 
+                                    label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
+                            else:
+                                for q in range(touch_leaving_point-touch_touching_point): 
+                                    label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
+                        self.label_touching_unet.append(label_touching_unet)
+                    
+                    
     def inject_idle_data(self, non_touching_csv: str):
         #TODO: implement this
         return 
@@ -460,6 +481,10 @@ class DataGenerator:
         """
         assert len(self.imu_instance_list) != 0 and len(self.imu_instance_following_list) != 0
         return self.imu_instance_list, self.imu_instance_following_list
+    
+    def get_list_for_segementation(self) -> tuple:
+        assert len(self.imu_instance_list) != 0 and len(self.label_touching_unet_list) != 0
+        return self.imu_instance_list, self.label_touching_unet_list
     
     def get_list_for_classification(self) -> tuple:
         """Get training data for classification task.
@@ -493,6 +518,7 @@ class DataGenerator:
         self.window_id_list = []
         self.imu_instance_following_list = []
         self.time_to_touch_list = []
+        self.label_touching_unet_list = []
     
     # In labelling 0 always represent idle
     def __generate_label(self, touch_point:int, start_idx:int, end_idx:int, label_pattern:int, activity_name:str):

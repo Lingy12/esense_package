@@ -132,6 +132,7 @@ class UNet(tf.Module):
             
             self.out_layer = Conv1D(1, 1, activation='sigmoid')
             
+            self.out_layer_forcasting = Conv1D(1, 1, activation='linear')
             self.dense = Dense(output_unit)
             self.for_seg = for_segamentation
             
@@ -176,8 +177,9 @@ class UNet(tf.Module):
         u9 = self.drop8(u8)
         c9 = self.downsample9(u8)
         
-        outputs = self.out_layer(c9)
+        if self.for_seg:
+            outputs = self.out_layer(c9)
+        else:
+            outputs = self.out_layer_forcasting(c9)
         
-        if not self.for_seg:
-            outputs = self.dense(outputs)
         return outputs   

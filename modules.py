@@ -67,23 +67,23 @@ class UNetConv1DBlock(tf.Module):
                 kernel_initializer = 'he_normal', padding = 'same')
             self.batchnorm_layer2 = BatchNormalization()
             self.activation2 = Activation('relu')
-        @tf.Module.with_name_scope
-        def __call__(self, x):
-            x = self.conv_layer1(x)
-            
-            if batchnorm:
-                x = self.batchnorm_layer1(x)
-            x = self.activation1(x)
-            
-            x = self.conv_layer2(x)
-            
-            if batchnorm:
-                x = self.batchnorm_layer2(x)
-            x = self.activation2(x)
-            return x
+    @tf.Module.with_name_scope
+    def __call__(self, x):
+        x = self.conv_layer1(x)
+        
+        if batchnorm:
+            x = self.batchnorm_layer1(x)
+        x = self.activation1(x)
+        
+        x = self.conv_layer2(x)
+        
+        if batchnorm:
+            x = self.batchnorm_layer2(x)
+        x = self.activation2(x)
+        return x
         
 class UNet(tf.Module):
-    def __init__(self, output_unit = -1, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True, name=None):
+    def __init__(self, for_segamentation = True, n_filters = 16, dropout = 0.1, batchnorm = True, name=None):
         """Unet module.
 
         Args:
@@ -133,7 +133,6 @@ class UNet(tf.Module):
             self.out_layer = Conv1D(1, 1, activation='sigmoid')
             
             self.out_layer_forcasting = Conv1D(6, 1, activation='linear')
-            self.dense = Dense(output_unit)
             self.for_seg = for_segamentation
             
 

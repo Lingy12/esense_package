@@ -38,10 +38,18 @@ class ClassificationModel(tf.keras.Model):
     def call(self, inputs):
         return self.layer(inputs)
     
-class UNetModel(tf.keras.Model):
+class UNetSegmentationModel(tf.keras.Model):
     def __init__(self):
         super().__init__()
         self.layer = UNet()
+    
+    def call(self, inputs):
+        return self.layer(inputs)
+
+class UNetForcastingModel(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.layer = UNet(for_segamentation=False)
     
     def call(self, inputs):
         return self.layer(inputs)

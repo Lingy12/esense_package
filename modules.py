@@ -71,13 +71,13 @@ class UNetConv1DBlock(tf.Module):
     def __call__(self, x):
         x = self.conv_layer1(x)
         
-        if batchnorm:
+        if self.batchnorm:
             x = self.batchnorm_layer1(x)
         x = self.activation1(x)
         
         x = self.conv_layer2(x)
         
-        if batchnorm:
+        if self.batchnorm:
             x = self.batchnorm_layer2(x)
         x = self.activation2(x)
         return x

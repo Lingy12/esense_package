@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from esense_package.visualize import plot_instances
 from esense_package.train_helper import TrainHelper
-from esense_package.models import ClassificationModel
+from esense_package.models import ClassificationModel, UNetModel
 from tensorflow.keras.utils import to_categorical
 from esense_package.evaluate_tool import get_confusionmatrix, get_derived_mucosal, get_classification_report, derive_mucosal
 from esense_package.data_tool import mucous_activity_label_list, non_mucous_activity_label_list
@@ -127,3 +127,30 @@ def train_and_evaludate_classification_model(data, **kwargs):
     print(f'Training {criteria}: {train_acc}')
     print(f'Testing {criteria}: {accuracy}')
     get_confusionmatrix(y_pred, testy, label_list, 'CM')
+    
+def train_and_evaludate_forcasting_model(data, **kwargs):
+    trainX, trainy, testX, testy = data
+    verbose, epochs, batch_size = kwargs['verbose'], kwargs['epochs'], kwargs['batch_size']
+    model_name = kwargs['model_name']
+    loss = kwargs['loss']
+    optimizer = kwargs['optimizer']
+    metrics = kwargs['metrics']
+    label_list = kwargs['label_list']
+    criteria = kwargs['criteria']
+    
+    n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
+    
+    model = 
+    model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
+
+    helper = TrainHelper(model, model_name, log=True)
+    helper.train_model(trainX, trainy, criteria=criteria, epochs=epochs, batch_size=batch_size, 
+            verbose=verbose, validation_data=(testX, testy))
+    model = helper.get_best_model()
+
+    _, test_loss = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
+    _, train_loss = model.evaluate(trainX, trainy, batch_size=batch_size, verbose=0)
+    y_pred = model.predict(testX)
+
+    print(f'Training {criteria}: {train_loss}')
+    print(f'Testing {criteria}: {test_loss}')

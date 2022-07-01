@@ -527,6 +527,11 @@ class DataGenerator:
     
     # In labelling 0 always represent idle
     def __generate_label(self, touch_point:int, start_idx:int, end_idx:int, label_pattern:int, activity_name:str):
+        reference_point = 150
+        
+        if touch_point < reference_point:
+            reference_point = 100 # Use this for now
+        
         if label_pattern == 1:
             return # Do nonthing because generation will handle with default pipeline
         elif label_pattern == 2:
@@ -540,7 +545,7 @@ class DataGenerator:
             else:
                 return 1
         elif label_pattern == 4:
-            if end_idx <= 150 + self.pre_touching_label_threshold:
+            if end_idx <= reference_point + self.pre_touching_label_threshold:
                 # 150 because the data starts 1.5s before touch
                 return 0 # idle
             elif end_idx <= touch_point + self.touching_label_threshold:
@@ -549,7 +554,7 @@ class DataGenerator:
                 return 2 # Touching
         elif label_pattern == 5:
             # +1 skip idle
-            if end_idx <= 150 + self.pre_touching_label_threshold:
+            if end_idx <= reference_point + self.pre_touching_label_threshold:
                 # 150 because the data starts 1.5s before touch
                 return 0 # idle
             elif end_idx <= touch_point + self.touching_label_threshold:
@@ -557,7 +562,7 @@ class DataGenerator:
             else:
                 return get_activity_code_arranged(activity_name) + 1 # Touching
         elif label_pattern == 6:
-            if end_idx <= 150 + self.pre_touching_label_threshold:
+            if end_idx <= reference_point + self.pre_touching_label_threshold:
                 # 150 because the data starts 1.5s before touch
                 return 0 # idle
             elif end_idx <= touch_point + self.touching_label_threshold:

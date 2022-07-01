@@ -348,6 +348,9 @@ class DataGenerator:
                     # print("end data point out of boundry!", i, j)
                     continue
                 
+                if touch_touching_point - 100 < 0:
+                    continue
+                
                 # Ensure the overlapping of touching point
                 if label_pattern == 1 and (data_start < touch_touching_point - data_length or data_end < touch_touching_point):
                     # print('Skipping non-overlapping')

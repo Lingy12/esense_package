@@ -121,25 +121,15 @@ def train_and_evaludate_classification_model(data, **kwargs):
             verbose=verbose, validation_data=(testX, testy))
     model = helper.get_best_model()
 
-    print('Training:')
-    _, accuracy = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
     print('Testing:')
-    _, train_acc = model.evaluate(trainX, trainy, batch_size=batch_size, verbose=0)
+    _, accuracy = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
+    # print('Testing:')
+    # _, train_acc = model.evaluate(trainX, trainy, batch_size=batch_size, verbose=0)
     y_pred = model.predict(testX)
 
-    fig, (ax1, ax2) = plt.subplot(1, 2)
-    ax1.plot(hist.history['loss'])
-    ax1.plot(hist.history['val_loss'])
-    ax1.ylabel('loss')
-    ax1.xlabel('epoch')
-    ax1.legend(['train', 'val'], loc='upper left')
-    
-    ax2.plot(hist.history['auc'])
-    ax2.plot(hist.history['val_auc'])
-    ax2.ylabel('loss')
-    ax2.xlabel('epoch')
-    ax2.legend(['train', 'val'], loc='upper left')
     get_confusionmatrix(y_pred, testy, label_list, 'CM')
+    
+    return hist
     
 def train_forcasting_model(data, **kwargs):
     trainX, trainy, testX, testy = data

@@ -4,6 +4,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0"
 from esense_package.data_tool import Dataset, DataGenerator
 import numpy as np
 import tensorflow as tf
+from matplotlib import pyplot as plt
 from esense_package.visualize import plot_instances
 from esense_package.train_helper import TrainHelper
 from esense_package.models import ClassificationModel, UNetForcastingModel
@@ -111,21 +112,33 @@ def train_and_evaludate_classification_model(data, **kwargs):
     
     n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
     
-    model = ClassificationModel(64, 3, (n_timesteps,n_features), n_outputs, 
-                                    feature_num = 100, regularize_ratio=0.001)
+    model = ClassificationModel(32, 3, (n_timesteps,n_features), n_outputs, 
+                                    feature_num = 10, regularize_ratio=2.)
     model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
 
     helper = TrainHelper(model, model_name, log=True)
-    helper.train_model(trainX, trainy, criteria=criteria, epochs=epochs, batch_size=batch_size, 
+    hist = helper.train_model(trainX, trainy, criteria=criteria, epochs=epochs, batch_size=batch_size, 
             verbose=verbose, validation_data=(testX, testy))
     model = helper.get_best_model()
 
+    print('Training:')
     _, accuracy = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
+    print('Testing:')
     _, train_acc = model.evaluate(trainX, trainy, batch_size=batch_size, verbose=0)
     y_pred = model.predict(testX)
 
-    print(f'Training {criteria}: {train_acc}')
-    print(f'Testing {criteria}: {accuracy}')
+    fig, (ax1, ax2) = plt.subplot(1, 2)
+    ax1.plot(hist.history['loss'])
+    ax1.plot(hist.history['val_loss'])
+    ax1.ylabel('loss')
+    ax1.xlabel('epoch')
+    ax1.legend(['train', 'val'], loc='upper left')
+    
+    ax2.plot(hist.history['auc'])
+    ax2.plot(hist.history['val_auc'])
+    ax2.ylabel('loss')
+    ax2.xlabel('epoch')
+    ax2.legend(['train', 'val'], loc='upper left')
     get_confusionmatrix(y_pred, testy, label_list, 'CM')
     
 def train_forcasting_model(data, **kwargs):

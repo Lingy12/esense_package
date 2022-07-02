@@ -112,8 +112,8 @@ def train_and_evaludate_classification_model(data, **kwargs):
     
     n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
     
-    model = ClassificationModel(128, 3, (n_timesteps,n_features), n_outputs, 
-                                    feature_num = 100, regularize_ratio=2.)
+    model = ClassificationModel(64, 3, (n_timesteps,n_features), n_outputs, 
+                                    feature_num = 100, regularize_ratio=0.01)
     model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
 
     helper = TrainHelper(model, model_name, log=True)
@@ -127,7 +127,7 @@ def train_and_evaludate_classification_model(data, **kwargs):
     # _, train_acc = model.evaluate(trainX, trainy, batch_size=batch_size, verbose=0)
     y_pred = model.predict(testX)
 
-    get_confusionmatrix(y_pred, testy, label_list, 'CM')
+    get_confusionmatrix(y_pred, testy, label_list, 'CM', save_fig=True, save_path=f'plots/CM_{model_name}')
     
     return hist
     

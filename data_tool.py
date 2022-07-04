@@ -302,7 +302,7 @@ class DataGenerator:
             6: label data as mucosal/non-mucosal with pre-touching label (5 classes)
             7: label idle/pre-touching only without touching data
             8: label pre-touching as mucosal and non-mucosal only
-            9: For segmentation
+            9: For forcasting only (Only include pre-touch and touch preiod)
             ...: More to go)
         """
         #TODO: implement different label pattern
@@ -362,7 +362,7 @@ class DataGenerator:
                 if label_pattern == 8 and (data_start + data_length < 150 or data_start + data_length > touch_touching_point): 
                     continue
                 
-                if label_pattern == 9 and data_start > touch_touching_point:
+                if label_pattern == 9 and data_start + data_length < touch_touching_point:
                     continue # Make sure the head containing pre-touching data
                 
                 if df_row_0["axis"]=="Ax": 
@@ -457,21 +457,9 @@ class DataGenerator:
                     self.time_to_touch_list.append(float(touch_touching_point - data_end) / 100) # TODO: Confirm this              
                     
                     if label_pattern == 9:
-                        label_touching_unet = [0 for i in range(data_length)]
-                        p = data_end - touch_touching_point
-                        # print(imu_following_list, data_following_length, data_end)
-                        # Only forcast pre-touching window
-                        if p < 0:
-                            self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
-                        else:
+                        if data_start > touch_leaving_point:
                             continue
-                        #     if touch_leaving_point >= touch_touching_point + p: ## when leaving point is out of the window
-                        #         for q in range(p): 
-                        #             label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
-                        #     else:
-                        #         for q in range(touch_leaving_point-touch_touching_point): 
-                        #             label_touching_unet[(data_length - p) + q] = 1 # data_length + p is the toching point in the window
-                        # self.label_touching_unet_list.append(label_touching_unet)
+                        self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
                     self.imu_instance_list.append(np.array(imu_list).T.tolist())
                     
                     

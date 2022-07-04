@@ -10,7 +10,8 @@ from tensorflow.keras.regularizers import L1, L2, L1L2
 
 class Conv1DBlock(tf.Module):
     def __init__(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
-                                    feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, regularize_ratio: float = 0, name=None):
+                                    feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, 
+                                    regularize_ratio: float = 0, for_forcasting=False, name=None):
         """Conv1D block for classification
 
         Args:
@@ -33,6 +34,8 @@ class Conv1DBlock(tf.Module):
             self.flatten = Flatten()
             self.dense1 = Dense(feature_num, activation='relu')
             self.dense2 = Dense(output_size, activation='softmax')
+            self.for_forcasting = for_forcasting
+            self.out = Dense(output_size)
     
     @tf.Module.with_name_scope
     def __call__(self, x):
@@ -42,7 +45,10 @@ class Conv1DBlock(tf.Module):
         x = self.pool_layer(x)
         x = self.flatten(x)
         x = self.dense1(x)
-        x = self.dense2(x)
+        if self.for_forcasting:
+            x = self.out(x)
+        else:
+            x = self.dense2(x)
         return x
     
 

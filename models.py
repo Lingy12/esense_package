@@ -81,12 +81,9 @@ class ForcastingWithSegmentationModel(tf.keras.Model):
             self.unet = UNet()
 
         def call(self, inputs):
-            print(inputs.shape)
             x = self.layer(inputs)
             forcast_out = self.reshape_layer(x)
-            print(forcast_out.shape)
             seg_in = self.concat([inputs, forcast_out])
-            print(seg_in.shape)
             seg_out = self.unet(seg_in)
             
             return forcast_out, seg_out

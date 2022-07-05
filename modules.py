@@ -35,7 +35,7 @@ class Conv1DBlock(tf.Module):
             self.dense1 = Dense(feature_num, activation='relu')
             self.dense2 = Dense(output_size, activation='softmax')
             self.for_forcasting = for_forcasting
-            self.out = Dense(output_size)
+            self.out = Dense(output_size, name=name)
     
     @tf.Module.with_name_scope
     def __call__(self, x):
@@ -136,9 +136,9 @@ class UNet(tf.Module):
             self.drop8 = Dropout(dropout)
             self.downsample9 = UNetConv1DBlock(n_filters * 1, kernel_size = 3, batchnorm = batchnorm)
             
-            self.out_layer = Conv1D(1, 1, activation='sigmoid')
+            self.out_layer = Conv1D(1, 1, activation='sigmoid', name=name)
             
-            self.out_layer_forcasting = Conv1D(6, 1, activation='linear')
+            self.out_layer_forcasting = Conv1D(6, 1, activation='linear', name=name)
             self.for_seg = for_segamentation
             
 

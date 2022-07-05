@@ -463,6 +463,14 @@ class DataGenerator:
                         self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
                         
                     if label_pattern == 10:
+                        # Skip non pre-touching preiod
+                        if self.__generate_label(touch_touching_point, 
+                                                                data_start, 
+                                                                data_start + data_length, 
+                                                                4, 
+                                                                df_row_0['activity']) != 1:
+                            continue
+                        
                         self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
                         total_length = data_length + data_following_length
                         

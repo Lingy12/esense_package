@@ -13,6 +13,7 @@ from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import MaxPooling1D
 from tensorflow.keras.layers import BatchNormalization, Activation, Conv1DTranspose,concatenate, add
 from tensorflow.keras.regularizers import L1, L2, L1L2
+from tensorflow.keras.layers import Reshape, Concatenate
 from .modules import Conv1DBlock, UNet
         
 class ClassificationModel(tf.keras.Model):
@@ -67,3 +68,25 @@ class UNetForcastingModel(tf.keras.Model):
     
     def call(self, inputs):
         return self.layer(inputs)
+    
+class ForcastingWithSegmentationModel(tf.keras.Model):
+        def __init__(self, filters_num:int, kernel_size:int, input_shape:int, forcasting_length:int, 
+                                        feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, 
+                                        regularize_ratio:float = 0):
+            super().__init__()
+            self.layer = Conv1DBlock(filters_num, kernel_size, input_shape, forcasting_length * 6, 
+                                     feature_num, dropout_rate, pool_size, regularize_ratio, True, 'ConvLayer')
+            self.reshape_layer = Reshape((-1, 6))
+            self.concat = Concatenate(axis=1)
+            self.unet = UNet()
+
+        def call(self, inputs):
+            print(inputs.shape)
+            x = self.layer(inputs)
+            forcast_out = self.reshape_layer(x)
+            print(forcast_out.shape)
+            seg_in = self.concat([inputs, forcast_out])
+            print(seg_in.shape)
+            seg_out = self.unet(seg_in)
+            
+            return forcast_out, seg_out

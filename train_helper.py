@@ -26,7 +26,7 @@ class TrainHelper:
             y (array like): train target.
             criteria (str, optional): Criteria to save the model. Defaults to 'val_accuracy'.
         """
-        assert len(x) == len(y)
+        assert len(x) == len(y) or len(x) == len(y[0]) == len(y[1])
         if self.log == True:
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.logging_path,
                                                  save_weights_only=True,

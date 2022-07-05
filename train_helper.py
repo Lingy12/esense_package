@@ -31,7 +31,7 @@ class TrainHelper:
                                                  save_weights_only=True,
                                                  monitor = criteria,
                                                  verbose=kwargs['verbose'], save_best_only=True)
-            if kwargs.__contains__('callback'):
+            if kwargs.__contains__('callbacks'):
                 kwargs['callbacks'].append(cp_callback)
             else:
                 kwargs['callbacks'] = [cp_callback]

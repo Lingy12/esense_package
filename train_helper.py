@@ -18,7 +18,7 @@ class TrainHelper:
         self.log = log
         self.model = model
     
-    def train_model(self, x, y, criteria:str = 'val_accuracy', **kwargs):
+    def train_model(self, x, y, criteria:str = 'val_loss', **kwargs):
         """Fit the model with keyward arguments as tf.keras.Model.fit.
 
         Args:

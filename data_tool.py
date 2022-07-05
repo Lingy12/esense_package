@@ -303,10 +303,11 @@ class DataGenerator:
             7: label idle/pre-touching only without touching data
             8: label pre-touching as mucosal and non-mucosal only
             9: For forcasting only (Only include pre-touch and touch preiod)
+            10: Pretouching with segmentation
             ...: More to go)
         """
         #TODO: implement different label pattern
-        assert label_pattern >= 1 and label_pattern <= 9
+        assert label_pattern >= 1 and label_pattern <= 10
         # assert for_test == False or user_only > 0 # Ensure the for_test triggered correctly
         for i in tqdm(range(int(len(self.df) / 6))):
             df_row_0 = self.df.iloc[i * 6, :]
@@ -362,7 +363,7 @@ class DataGenerator:
                 if label_pattern == 8 and (data_start + data_length < 150 or data_start + data_length > touch_touching_point): 
                     continue
                 
-                if label_pattern == 9 and data_start + data_length < touch_touching_point:
+                if (label_pattern == 9 or label_pattern == 10) and data_start + data_length < touch_touching_point:
                     continue # Make sure the head containing pre-touching data
                 
                 if df_row_0["axis"]=="Ax": 
@@ -460,6 +461,31 @@ class DataGenerator:
                         if data_start > touch_leaving_point:
                             continue
                         self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
+                        
+                    if label_pattern == 10:
+                        self.imu_instance_following_list.append(np.array(imu_following_list).T.tolist())
+                        total_length = data_length + data_following_length
+                        
+                        label_touching_unet = [0 for i in range(total_length)]
+                        start_idx = touch_touching_point - data_start
+                        end_idx = touch_leaving_point - data_start
+                        
+                        if start_idx < total_length and end_idx > total_length:
+                            for k in range(start_idx, total_length):
+                                label_touching_unet[k] = 1
+                        elif start_idx < total_length and end_idx < total_length:
+                            for k in range(start_idx, end_idx + 1):
+                                label_touching_unet[k] = 1
+                        elif start_idx < 0 and end_idx < total_length:
+                            for k in range(end_idx + 1):
+                                label_touching_unet[k] = 1
+                        else:
+                            label_touching_unet = label_touching_unet
+                        
+                        self.label_touching_unet_list.append(label_touching_unet)
+                        
+                        
+                            
                     self.imu_instance_list.append(np.array(imu_list).T.tolist())
                     
                     
@@ -481,6 +507,10 @@ class DataGenerator:
     def get_list_for_segementation(self) -> tuple:
         assert len(self.imu_instance_list) != 0 and len(self.label_touching_unet_list) != 0
         return self.imu_instance_list, self.label_touching_unet_list
+    
+    def get_list_for_forcasting_and_segmentation(self) -> tuple:
+        assert len(self.imu_instance_list) != 0 and len(self.label_touching_unet_list) != 0 and len(self.imu_instance_following_list) != 0
+        return self.imu_instance_list, self.imu_instance_following_list, self.label_touching_unet_list
     
     def get_list_for_classification(self) -> tuple:
         """Get training data for classification task.

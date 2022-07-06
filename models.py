@@ -76,9 +76,9 @@ class ForcastingWithSegmentationModel(tf.keras.Model):
             super().__init__()
             self.layer = Conv1DBlock(filters_num, kernel_size, input_shape, forcasting_length * 6, 
                                      feature_num, dropout_rate, pool_size, regularize_ratio, True, 'ConvLayer')
-            self.reshape_layer = Reshape((-1, 6))
+            self.reshape_layer = Reshape((-1, 6), name='forcast_out')
             self.concat = Concatenate(axis=1)
-            self.unet = UNet()
+            self.unet = UNet(name='seg_out')
 
         def call(self, inputs):
             x = self.layer(inputs)
@@ -86,4 +86,5 @@ class ForcastingWithSegmentationModel(tf.keras.Model):
             seg_in = self.concat([inputs, forcast_out])
             seg_out = self.unet(seg_in)
             
-            return forcast_out, seg_out
+            return {'forcast_out':forcast_out, 'seg_out':seg_out}
+        

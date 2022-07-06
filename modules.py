@@ -54,7 +54,7 @@ class Conv1DBlock(tf.Module):
 class Conv1DBlockWithoutOut(tf.Module):
     def __init__(self, filters_num:int, kernel_size:int, input_shape:int, output_size:int, 
                                     feature_num: int = 100, dropout_rate:int = 0.5, pool_size:int=2, 
-                                    regularize_ratio: float = 0, for_forcasting=False, name=None):
+                                    regularize_ratio: float = 0, name=None):
         """Conv1D block for classification
 
         Args:

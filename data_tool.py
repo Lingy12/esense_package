@@ -122,8 +122,8 @@ class Dataset:
         
         df_facetouching_point_labeling_6x = pd.DataFrame(np.repeat(self.df_facetouching_point_labeling.values,6,axis=0))
         df_facetouching_point_labeling_6x.columns = self.df_facetouching_point_labeling.columns
-        self.df_facetouch_imu_sorted['touching point'] = df_facetouching_point_labeling_6x['touching point']+100
-        self.df_facetouch_imu_sorted['leaving point'] = df_facetouching_point_labeling_6x['leaving point']+100
+        self.df_facetouch_imu_sorted['touching point'] = df_facetouching_point_labeling_6x['touching point']+150
+        self.df_facetouch_imu_sorted['leaving point'] = df_facetouching_point_labeling_6x['leaving point']+150
         self.df_facetouch_imu_sorted['source'] = df_facetouching_point_labeling_6x['source']
         self.df_facetouch_imu_sorted = self.df_facetouch_imu_sorted.replace("Rub near eyes (under eyes, eyebrows)_Left","[Mucosal]Rub eyes (L)")
         self.df_facetouch_imu_sorted = self.df_facetouch_imu_sorted.replace("Rub near eyes (under eyes, eyebrows)_Right","[Mucosal]Rub eyes (R)")

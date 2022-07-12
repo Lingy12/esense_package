@@ -4,7 +4,6 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0"
 from esense_package.data_tool import Dataset, DataGenerator
 import numpy as np
 import tensorflow as tf
-from tensorflow.data import Dataset
 from matplotlib import pyplot as plt
 from esense_package.visualize import plot_instances
 from esense_package.train_helper import TrainHelper
@@ -188,9 +187,9 @@ def create_data(**kwargs):
     
     val_size = int(len(trainX) / 10)
 
-    train_ds = Dataset.from_tensor_slices((trainX[:-val_size], {'class_out': train_class[:-val_size], 'forcast_out':train_forcast[:-val_size], 'seg_out':train_seg[:-val_size]}))
-    val_ds = Dataset.from_tensor_slices((trainX[-val_size:], {'class_out': train_class[-val_size:], 'forcast_out':train_forcast[-val_size:], 'seg_out':train_seg[-val_size:]}))
-    test_ds = Dataset.from_tensor_slices((testX, {'class_out': test_class, 'forcast_out':test_forcast, 'seg_out':test_seg}))
+    train_ds = tf.data.Dataset.from_tensor_slices((trainX[:-val_size], {'class_out': train_class[:-val_size], 'forcast_out':train_forcast[:-val_size], 'seg_out':train_seg[:-val_size]}))
+    val_ds = tf.data.Dataset.from_tensor_slices((trainX[-val_size:], {'class_out': train_class[-val_size:], 'forcast_out':train_forcast[-val_size:], 'seg_out':train_seg[-val_size:]}))
+    test_ds = tf.data.Dataset.from_tensor_slices((testX, {'class_out': test_class, 'forcast_out':test_forcast, 'seg_out':test_seg}))
 
     return train_ds, val_ds, test_ds
     

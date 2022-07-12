@@ -112,3 +112,22 @@ def visualize_reconstruction(model, testX:np.array, y_pred: np.array, testy:np.a
 
     for idx in indices:
         plot_instance(testX[idx], testy[idx], y_pred[idx], axis, color_map)
+        
+def unzip_dataset(ds):
+    testX_list = []
+    class_out_list = []
+    forcast_out_list = []
+    seg_out_list = []
+
+    for x, y in ds.as_numpy_iterator():
+        testX_list.append(x)
+        class_out_list.append(y['class_out'])
+        forcast_out_list.append(y['forcast_out'])
+        seg_out_list.append(y['forcast_out'])
+        
+    testX = np.stack(testX_list)
+    class_out_hat = np.stack(class_out_list)
+    forcast_out_hat = np.stack(forcast_out_list)
+    seg_out_hat = np.stack(seg_out_list)
+    
+    return testX, class_out_hat, forcast_out_hat, seg_out_hat

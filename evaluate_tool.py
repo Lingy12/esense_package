@@ -133,6 +133,8 @@ def unzip_dataset(ds):
     return testX, class_out_hat, forcast_out_hat, seg_out_hat
 
 def plot_forcast_with_seg(seen_series, actual_next, pred_next, segmentation_mask, true_mask):
+    axis = ['Ax', 'Ay', 'Az', 'Gx', 'Gy', 'Gz']
+    color_map = ['r', 'g', 'b']
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15,5))
     true_signal = np.concatenate([seen_series, actual_next]).T
     pred_signal = np.concatenate([seen_series, pred_next]).T

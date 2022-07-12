@@ -131,3 +131,26 @@ def unzip_dataset(ds):
     seg_out_hat = np.stack(seg_out_list)
     
     return testX, class_out_hat, forcast_out_hat, seg_out_hat
+
+def plot_forcast_with_seg(seen_series, actual_next, pred_next, segmentation_mask, true_mask):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15,5))
+    true_signal = np.concatenate([seen_series, actual_next]).T
+    pred_signal = np.concatenate([seen_series, pred_next]).T
+    
+    for i in range(len(axis)):
+        if i < 3:
+            ax1.plot(true_signal[i], f'{color_map[i]}-', label=f'[{axis[i]}]true')
+            ax1.plot(pred_signal[i], f'{color_map[i]}--', label=f'[{axis[i]}]pred')
+            ax1.set_title('Acc')
+        else:
+            ax2.plot(true_signal[i], f'{color_map[i - 3]}-', label=f'[{axis[i]}]true')
+            ax2.plot(pred_signal[i], f'{color_map[i - 3]}--', label=f'[{axis[i]}]pred')
+            ax2.set_title('Gyro')
+    ax1.plot(segmentation_mask, 'y.-', label='predicted mask')
+    ax2.plot(segmentation_mask * 50, 'y.-', label='predicted mask')
+    ax1.plot(true_mask, 'k.-', label='True mask')
+    ax2.plot(true_mask * 50, 'k.-', label='True mask')
+    ax1.legend(loc ="lower left");
+    ax2.legend(loc="lower left")
+    plt.legend()
+    plt.show()

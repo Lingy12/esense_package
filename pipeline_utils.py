@@ -179,8 +179,8 @@ def create_data(**kwargs):
     print(np.histogram(train_class, bins=kwargs['num_class']))
     print(np.histogram(test_class, bins=kwargs['num_class']))
     
-    testX, test_class, test_forcasting, test_seg = np.array(testX), to_categorical(np.array(test_class)), np.array(test_forcasting), np.array(test_seg)
-    trainX, train_class, train_forcasting, train_seg= np.array(trainX), to_categorical(np.array(train_class)), np.array(train_forcasting), np.array(train_seg)
+    testX, test_class, test_forcast, test_seg = np.array(testX), to_categorical(np.array(test_class)), np.array(test_forcasting), np.array(test_seg)
+    trainX, train_class, train_forcast, train_seg= np.array(trainX), to_categorical(np.array(train_class)), np.array(train_forcasting), np.array(train_seg)
 
     print(f'Training instance: {len(trainX)}')
     print(f'Test instance: {len(testX)}')

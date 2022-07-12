@@ -123,7 +123,7 @@ def unzip_dataset(ds):
         testX_list.append(x)
         class_out_list.append(y['class_out'])
         forcast_out_list.append(y['forcast_out'])
-        seg_out_list.append(y['forcast_out'])
+        seg_out_list.append(y['seg_out'])
         
     testX = np.stack(testX_list)
     class_out_hat = np.stack(class_out_list)

@@ -4,6 +4,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0"
 from esense_package.data_tool import Dataset, DataGenerator
 import numpy as np
 import tensorflow as tf
+from tensorflow.data import Dataset
 from matplotlib import pyplot as plt
 from esense_package.visualize import plot_instances
 from esense_package.train_helper import TrainHelper

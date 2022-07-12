@@ -175,13 +175,23 @@ def create_data(**kwargs):
 
     trainX, train_class, train_forcasting, train_seg = train_dg.get_list_for_esense_task()
     testX, test_class, test_forcasting, test_seg = test_dg.get_list_for_esense_task()
+    
+    print(np.histogram(train_class, bins=kwargs['num_class']))
+    print(np.histogram(test_class, bins=kwargs['num_class']))
+    
     testX, test_class, test_forcasting, test_seg = np.array(testX), to_categorical(np.array(test_class)), np.array(test_forcasting), np.array(test_seg)
     trainX, train_class, train_forcasting, train_seg= np.array(trainX), to_categorical(np.array(train_class)), np.array(train_forcasting), np.array(train_seg)
 
     print(f'Training instance: {len(trainX)}')
     print(f'Test instance: {len(testX)}')
     
-    return trainX, testX, train_class, test_class, train_forcasting, test_forcasting, train_seg, test_seg
+    val_size = int(len(trainX) / 10)
+
+    train_ds = Dataset.from_tensor_slices((trainX[:-val_size], {'class_out': train_class[:-val_size], 'forcast_out':train_forcast[:-val_size], 'seg_out':train_seg[:-val_size]}))
+    val_ds = Dataset.from_tensor_slices((trainX[-val_size:], {'class_out': train_class[-val_size:], 'forcast_out':train_forcast[-val_size:], 'seg_out':train_seg[-val_size:]}))
+    test_ds = Dataset.from_tensor_slices((testX, {'class_out': test_class, 'forcast_out':test_forcast, 'seg_out':test_seg}))
+
+    return train_ds, val_ds, test_ds
     
 def train_and_evaludate_classification_model(data, **kwargs):
     trainX, trainy, testX, testy = data
